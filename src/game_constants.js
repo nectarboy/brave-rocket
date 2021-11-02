@@ -1,8 +1,0 @@
-const GAME_INTERVAL = 1000 / 60;
-const BG_PARALLAX = 0.02;
-const PLAYER_BOTTOM_OFFSET = 66;
-const PLAYER_VEL_BOTTOM = 208;
-const PLAYER_VEL_TOP = 80; // 78
-const CLOUD_SPRITE_W = 32;
-const CLOUD_MIN_W = 32;
-const CLOUD_MAX_W = 64;
