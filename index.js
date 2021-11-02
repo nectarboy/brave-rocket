@@ -1,9 +1,10 @@
 // start game
 loadAssets(
     [
-        ['entities', Image, 'src/gfx/entities.png'],
-        ['background_top', Image, 'src/gfx/background_top.png'],
-        ['background_bottom', Image, 'src/gfx/background_bottom.png'],
+        ['entities', Image, 'src/braverocket/gfx/entities.png'],
+        ['floor', Image, 'src/braverocket/gfx/floor.png'],
+        ['background_top', Image, 'src/braverocket/gfx/background_top.png'],
+        ['background_bottom', Image, 'src/braverocket/gfx/background_bottom.png'],
     ],
     // when done
     () => {

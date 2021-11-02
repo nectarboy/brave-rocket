@@ -1,0 +1,9 @@
+.BraveRocket {
+    margin: auto 0;
+    text-align: center;
+}
+.BraveRocketCanvas {
+    width: 400px;
+    border: 1px solid black;
+    image-rendering: pixelated;
+}
