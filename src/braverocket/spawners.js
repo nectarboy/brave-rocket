@@ -10,7 +10,7 @@ function spawnPlayer() {
 function spawnCloud() {
     var cloud = new Cloud(0, 0);
     cloud.x = randInt(-cloud.w/2, canvas.width - cloud.w/2);
-    cloud.y = camY - cloud.h;
+    cloud.y = camY - cloud.h * 2;
     cloud.generateSprites();
     cloud.updateSprite();
 

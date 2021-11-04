@@ -1,0 +1,7 @@
+stop sprite system using 8x8
+gui
+velocity meter + score n stuff
+balancing ?
+death screen
+bird enemy
+easter eggs :3

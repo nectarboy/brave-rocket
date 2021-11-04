@@ -5,7 +5,7 @@ class BackgroundObj {
         this.x = x;
         this.y = y;
 
-        this.h = this.sprite.scale * this.sprite.asset.height;
+        this.h = this.sprite.scale * this.sprite.h;
     }
 
     draw() {

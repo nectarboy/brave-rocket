@@ -1,18 +1,57 @@
+var incutscene = false;
+
+function prepareTitleScreen() {
+    loopstate = 0;
+
+    incutscene = false;
+    entities.push(spawnFloorProp());
+}
+function prepareMainGame() {
+    loopstate = 1;
+    incutscene = false;
+}
+
 const loopStates = {
     // title screen
     0: {
         update: function() {
             player.resetstartpositionflag = true;
             updatePlayer();
+            updateEntities();
 
-            if (controller.clicking) {
-                loopstate = 1;
+            // gui
+            gui.braverocket_logo.update();
+
+            // playing
+            if (!incutscene && controller.clicking) {
+                incutscene = true;
+
+                var etick = 0;
+                var logo = gui.braverocket_logo;
+                logo.shouldanimate = false;
+                addEvent(() => {
+                    if (etick === 60) {
+                        prepareMainGame();
+                        return true;
+                    }
+                    else {
+                        etick++;
+
+                        // gui
+                        logo.y += BRAVEROCKET_LOGO_OFFSTAGE_RATE * (BRAVEROCKET_LOGO_OFFSTAGE_Y - logo.y);
+
+                        return false;
+                    }
+                });
             }
         },
         draw: function() {
             drawBackgrounds();
-            drawPlayer();
             drawEntities();
+            drawPlayer();
+
+            // gui
+            gui.braverocket_logo.draw();
         }
     },
 
@@ -26,8 +65,8 @@ const loopStates = {
         },
         draw: function() {
             drawBackgrounds();
-            drawPlayer();
             drawEntities();
+            drawPlayer();
         }
     }
-}
+};

@@ -15,6 +15,11 @@ class Sprite {
         this.scale = scale;
     };
 
+    centerOnto(x, y, w, h) {
+        this.x = x - this.scale * (this.w*0.5) + w*0.5;
+        this.y = y - this.scale * (this.h*0.5) + h*0.5;
+    }
+
     draw() {
         if (this.invisible)
             return;
@@ -33,11 +38,6 @@ class Sprite {
             0|(this.scale * this.w), 0|(this.scale * this.h)
         );
     }
-
-    centerOnto(x, y, w, h) {
-        this.x = x - this.scale * (this.w*0.5) + w*0.5;
-        this.y = y - this.scale * (this.h*0.5) + h*0.5;
-    }
 }
 
 class WholeSprite {
@@ -46,9 +46,16 @@ class WholeSprite {
 
         this.x = x;
         this.y = y;
+        this.w = this.asset.width;
+        this.h = this.asset.height;
         this.scale = scale;
         this.invisible = false;
     };
+
+    centerOnto(x, y, w, h) {
+        this.x = x - this.scale * (this.w*0.5) + w*0.5;
+        this.y = y - this.scale * (this.h*0.5) + h*0.5;
+    }
 
     draw() {
         if (this.invisible)

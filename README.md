@@ -3,7 +3,8 @@
 
 !!!! WIP !!!! the little goblins are still building the game ok ?
 
-![uh oh](https://github.com/nectarboy/brave-rocket/blob/main/docs/uh_oh.png?raw=true)
+![mmm](https://github.com/nectarboy/brave-rocket/blob/main/docs/title_screen.png?raw=true)
+![yum](https://github.com/nectarboy/brave-rocket/blob/main/docs/uh_oh.png?raw=true)
 
 ## How do I play ??
 - Move your mouse to move your little rocket around

@@ -28,5 +28,4 @@ function drawEntities() {
 }
 function resetEntities() {
     entities.length = 0;
-    entities.push(spawnFloorProp());
 }

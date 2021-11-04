@@ -1,3 +1,8 @@
+window.localStorage.braverocket ||= {
+    selectedskin: 0
+};
+const gameLocalStorage = window.localStorage.braverocket;
+
 var globalpaused = false;
 var paused = false;
 var running = false;
@@ -13,19 +18,16 @@ var camX = 0;
 var camY = 0;
 
 function correctCamX(x) {
-    return x - camX;
+    return x - Math.round(camX);
 }
 function correctCamY(y) {
-    return y - camY;
+    return y - Math.round(camY);
 }
 
 // game logic
-function gameUpdateEvents() {
-
-}
 function gameUpdate() {
     loopStates[loopstate].update();
-    gameUpdateEvents();
+    updateEvents();
     DEBUGUPDATE();
 
     tick++;
@@ -46,16 +48,19 @@ function gameReset() {
     resetflag = false;
     loopstate = 0;
     tick = 0;
-    spritebuffer.length = 0;
+    //spritebuffer.length = 0;
 
     camX = 0;
     camY = 0;
 
     // reset everything
+    resetEvents();
     resetCloudSpawn();
     resetPlayer();
     resetEntities();
     resetBackgrounds();
+    resetGui();
+    prepareTitleScreen();
 
     DEBUGRESET();
 }
@@ -103,7 +108,7 @@ var debugThing = {};
 
 function DEBUGRESET() {
     debugThing = new Entity(0, 0, 1, 1);
-    debugThing.sprite = new Sprite(assets['entities'], 0,0,16,16, 32, 0);
+    debugThing.sprite = new Sprite(assets['entities'], 0,0,16,16, 64, 0);
 }
 
 function DEBUGUPDATE() {

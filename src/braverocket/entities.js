@@ -2,10 +2,16 @@ class Player extends Entity {
     constructor(x, y) {
         super(x, y, 12, 12);
         this.minVy = -1; // -1.5
-        this.maxVy = -15;
+        this.maxVy = -12; // -15
         this.vy = 0;
 
+        this.dead = false;
         this.resetstartpositionflag = false;
+
+        this.deathscroll = 0;
+
+        this.particletick = 0;
+        this.particlerate = 3;
 
         this.sprite = new Sprite(assets['entities'], 0,0, 16,16, 0, 2);
     }
@@ -15,13 +21,63 @@ class Player extends Entity {
         this.y = canvas.height - PLAYER_BOTTOM_OFFSET - this.h;
     }
 
+    deathScrollCamera() {
+        camY += this.deathscroll;
+        this.deathscroll *= DEATHSCROLL_SLOWDOWN_MUL;
+    }
+    deathAnimation() {
+        this.sprite.invisible = true;
+
+        var x = this.x + this.w*0.5;
+        var y = this.y + this.h*0.5;
+        var velrange = 1 - (this.vy - this.maxVy) / (this.minVy - this.maxVy);
+
+        // explosion
+        var explosionammount = PLAYER_EXPLOSION_MIN + velrange * (PLAYER_EXPLOSION_MAX - PLAYER_EXPLOSION_MIN);
+        for (var i = 0; i < explosionammount; i++) {
+            entities.push(particleSpawners.combust(x, y));
+        }
+
+        // boom
+        entities.push(particleSpawners.boom(x, y));
+    }
+    die() {
+        if (this.dead) return;
+        this.dead = true;
+
+        this.deathscroll = this.vy * DEATHSCROLL_VEL_MUL;
+        this.deathAnimation();
+    }
+    checkShouldRestartGame() {
+        if (!controller.clicking) return;
+
+        gameReset();
+        prepareMainGame();
+    }
+
+    updateParticles() {
+        if (this.particletick >= this.particlerate) {
+            this.particletick = 0;
+
+            var x = this.x + this.w*0.5;
+            var y = this.y + this.sprite.scale * this.sprite.h;
+            var velrange = (this.vy - this.maxVy) / (this.minVy - this.maxVy);
+            var fireCharOffset = randNum(velrange*0.1, velrange*0.5);
+            var smokeCharOffset = randNum(0, velrange*0.75);
+            entities.push(particleSpawners.smoke(x, y, smokeCharOffset));
+            entities.push(particleSpawners.fire(x, y, fireCharOffset));
+        }
+        else {
+            this.particletick++;
+        }
+    }
     updatePosition() {
         this.x = controller.x - this.w*0.5;
         if (this.x < 0) {
             this.x = 0;
         }
         else {
-            const edge = canvas.width - this.w;
+            var edge = canvas.width - this.w;
             if (this.x > edge)
                 this.x = edge;
         }
@@ -48,9 +104,16 @@ class Player extends Entity {
     }
 
     update() {
-        this.updateVelocity();
-        this.updatePosition();
-        this.updateCamera();
+        if (!this.dead) {
+            this.updateVelocity();
+            this.updatePosition();
+            this.updateParticles();
+            this.updateCamera();
+        }
+        else {
+            this.checkShouldRestartGame();
+            this.deathScrollCamera();
+        }
     }
 
     updateSprite() {
@@ -83,7 +146,7 @@ class Cloud extends Entity {
 
     checkTouchingPlayer() {
         if (this.insideEnt(player)) {
-            resetflag = true;
+            player.die();
         }
     }
     checkShouldKill() {
@@ -118,19 +181,18 @@ class Cloud extends Entity {
 class FloorProp extends Entity {
     constructor(x, y) {
         super(x, y, 0, 0);
-
-        this.x = x;
-        this.y = y;
-
         this.sprite = new WholeSprite(assets['floor'], 0,0, 2);
-        this.w = this.sprite.asset.w;
     }
 
-    update() {
+    checkShouldKill() {
         if (camY + canvas.height < this.y) {
             this.shouldkill = true;
             console.log('floor ded !');
         }
+    }
+
+    update() {
+        this.checkShouldKill();
     }
 
     updateSprite() {
