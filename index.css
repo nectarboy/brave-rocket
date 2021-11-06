@@ -23,6 +23,8 @@ html, body {
     -moz-image-rendering: pixelated;
     font-smooth: never;
     -webkit-font-smoothing: none;
+
+    touch-action: none;
 }
 
 @font-face {
