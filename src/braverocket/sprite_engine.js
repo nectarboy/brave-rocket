@@ -69,3 +69,28 @@ class WholeSprite {
         );
     }
 }
+
+class Text {
+    constructor(x, y, text, size, color, center) {
+        this.invisible = false;
+
+        this.x = x;
+        this.y = y;
+        this.text = text;
+        this.size = size;
+        this.color = color;
+        this.center = center;  
+    }
+
+    draw() {
+        if (this.invisible)
+            return;
+
+        ctx.font = this.size + 'px BraveRocketFont';
+        ctx.textAlign = this.center ? 'center' : 'start';
+        ctx.fillStyle = this.color;
+        for (var i = 0; i < this.text.length; i++) {
+            ctx.fillText(this.text[i], this.x, this.y - this.text.length * this.size*0.5 + i*this.size);
+        }
+    }
+}

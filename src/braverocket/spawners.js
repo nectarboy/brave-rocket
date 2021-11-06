@@ -3,6 +3,7 @@ function spawnPlayer() {
     player.x = canvas.width/2 - player.w/2;
     player.resetStartPosition();
     player.updateSprite();
+    player.bottomoffset = PLAYER_TITLESCREEN_BOTTOM_OFFSET;
         
     return player;
 }

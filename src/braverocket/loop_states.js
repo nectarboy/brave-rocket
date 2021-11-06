@@ -8,7 +8,9 @@ function prepareTitleScreen() {
 }
 function prepareMainGame() {
     loopstate = 1;
+
     incutscene = false;
+    player.bottomoffset = PLAYER_MAINGAME_BOTTOM_OFFSET;
 }
 
 const loopStates = {
@@ -27,18 +29,20 @@ const loopStates = {
                 incutscene = true;
 
                 var etick = 0;
-                var logo = gui.braverocket_logo;
-                logo.shouldanimate = false;
+                gui.braverocket_logo.shouldanimate = false;
                 addEvent(() => {
-                    if (etick === 60) {
+                    if (etick === MAINGAME_DELAY) {
                         prepareMainGame();
                         return true;
                     }
                     else {
                         etick++;
 
+                        // player
+                        player.bottomoffset -= player.bottomoffsetRate * (player.bottomoffset - PLAYER_MAINGAME_BOTTOM_OFFSET);
                         // gui
-                        logo.y += BRAVEROCKET_LOGO_OFFSTAGE_RATE * (BRAVEROCKET_LOGO_OFFSTAGE_Y - logo.y);
+                        gui.braverocket_logo.y -= gui.braverocket_logo.offstageRate * (gui.braverocket_logo.y - gui.braverocket_logo.offstageY);
+                        gui.titlescreen_footer.text.invisible = true;
 
                         return false;
                     }
@@ -52,6 +56,7 @@ const loopStates = {
 
             // gui
             gui.braverocket_logo.draw();
+            gui.titlescreen_footer.draw();
         }
     },
 

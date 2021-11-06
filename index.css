@@ -1,3 +1,8 @@
+html, body {
+    margin: 0;
+    height: 100%;
+}
+
 .BraveRocket {
     margin: auto 0;
     text-align: center;
@@ -6,4 +11,12 @@
     width: 400px;
     border: 1px solid black;
     image-rendering: pixelated;
+    -moz-image-rendering: pixelated;
+    font-smooth: never;
+    -webkit-font-smoothing: none;
+}
+
+@font-face {
+    font-family: "BraveRocketFont";
+    src: url("src/assets/Delfino.ttf");
 }

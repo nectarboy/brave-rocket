@@ -1,13 +1,16 @@
 class Player extends Entity {
     constructor(x, y) {
-        super(x, y, 12, 12);
+        super(x, y, 12, 16);
         this.minVy = -1; // -1.5
-        this.maxVy = -12; // -15
+        this.maxVy = -15; // -15
         this.vy = 0;
 
         this.dead = false;
         this.resetstartpositionflag = false;
 
+        this.bottomoffset = 0;
+        this.bottomoffsetRate = 0.1;
+        
         this.deathscroll = 0;
 
         this.particletick = 0;
@@ -18,7 +21,7 @@ class Player extends Entity {
 
     resetStartPosition() {
         this.resetstartpositionflag = false;
-        this.y = canvas.height - PLAYER_BOTTOM_OFFSET - this.h;
+        this.y = canvas.height - PLAYER_TITLESCREEN_BOTTOM_OFFSET - this.h;
     }
 
     deathScrollCamera() {
@@ -42,7 +45,7 @@ class Player extends Entity {
         entities.push(particleSpawners.boom(x, y));
     }
     die() {
-        if (this.dead) return;
+        if (GODMODE || this.dead) return;
         this.dead = true;
 
         this.deathscroll = this.vy * DEATHSCROLL_VEL_MUL;
@@ -100,7 +103,7 @@ class Player extends Entity {
         this.vy = (this.minVy + range * (this.maxVy - this.minVy));
     }
     updateCamera() {
-        camY = -(canvas.height - (PLAYER_BOTTOM_OFFSET + this.y));
+        camY = -(canvas.height - (this.bottomoffset + this.y));
     }
 
     update() {
@@ -121,7 +124,7 @@ class Player extends Entity {
     }
     draw() {
         this.updateSprite();
-        spritebuffer.push(this.sprite);
+        bufferFrame(this.sprite);
     }
 }
 
@@ -173,7 +176,7 @@ class Cloud extends Entity {
     draw() {
         this.updateSprite();
         for (var i = 0; i < this.sprites.length; i++) {
-            spritebuffer.push(this.sprites[i]);
+            bufferFrame(this.sprites[i]);
         }
     }
 }
@@ -200,6 +203,6 @@ class FloorProp extends Entity {
     }
     draw() {
         this.updateSprite();
-        spritebuffer.push(this.sprite);
+        bufferFrame(this.sprite);
     }
 }

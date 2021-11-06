@@ -48,7 +48,7 @@ class Particle extends Entity {
     }
     draw() {
         this.updateSprite();
-        spritebuffer.push(this.sprite);
+        bufferFrame(this.sprite);
     }
 }
 

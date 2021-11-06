@@ -1,3 +1,5 @@
+// 1.1
+
 window.localStorage.braverocket ||= {
     selectedskin: 0
 };
@@ -12,7 +14,6 @@ var resetflag = false;
 // game components
 var loopstate = 0;
 var tick = 0;
-var spritebuffer = [];
 
 var camX = 0;
 var camY = 0;
@@ -39,7 +40,7 @@ function gameUpdate() {
 function gameDraw() {
     if (requestedframe) return;
 
-    spritebuffer.length = 0;
+    flushFrameBuffer();
 
     loopStates[loopstate].draw();
     DEBUGDRAW();
@@ -48,7 +49,7 @@ function gameReset() {
     resetflag = false;
     loopstate = 0;
     tick = 0;
-    //spritebuffer.length = 0;
+    //flushFrameBuffer();
 
     camX = 0;
     camY = 0;
@@ -67,16 +68,7 @@ function gameReset() {
 
 function drawFrame() {
     requestedframe = false;
-
-    for (var i = 0; i < spritebuffer.length; i++) {
-        spritebuffer[i].draw(ctx);
-    }
-
-    // DEBUG HITBOX
-    // ctx.strokeStyle = 'red';
-    // for (var i = 0; i < entities.length; i++) {
-    //     ctx.strokeRect(entities[i].x-0.5, correctCamY(entities[i].y-0.5), entities[i].w, entities[i].h);
-    // }
+    drawFrameBuffer();
 }
 function requestFrame() {
     if (requestedframe) return;
@@ -120,5 +112,5 @@ function DEBUGUPDATE() {
 
 function DEBUGDRAW() {
     printText([tick]);
-    spritebuffer.push(debugThing.sprite);
+    bufferFrame(debugThing.sprite);
 }

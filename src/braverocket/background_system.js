@@ -13,7 +13,7 @@ class BackgroundObj {
 
         this.sprite.x = this.x;
         this.sprite.y = this.y;
-        spritebuffer.push(this.sprite);
+        bufferFrame(this.sprite);
     }
 }
 
