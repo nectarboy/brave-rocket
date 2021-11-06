@@ -1,6 +1,6 @@
 class Player extends Entity {
     constructor(x, y) {
-        super(x, y, 12, 16);
+        super(x, y, 12, 12);
         this.minVy = -1; // -1.5
         this.maxVy = -15; // -15
         this.vy = 0;
@@ -63,7 +63,7 @@ class Player extends Entity {
             this.particletick = 0;
 
             var x = this.x + this.w*0.5;
-            var y = this.y + this.sprite.scale * this.sprite.h;
+            var y = this.sprite.y + camY + this.sprite.scale * this.sprite.h;
             var velrange = (this.vy - this.maxVy) / (this.minVy - this.maxVy);
             var fireCharOffset = randNum(velrange*0.1, velrange*0.5);
             var smokeCharOffset = randNum(0, velrange*0.75);
