@@ -42,6 +42,6 @@ document.addEventListener('mousemove', onMouseMove);
 canvas.addEventListener('mousedown', onTouchDown);
 document.addEventListener('mouseup', onTouchUp);
 
-canvas.addEventListener('touchmove', onTouchMove);
-canvas.addEventListener('touchstart', onMouseDown);
-canvas.addEventListener('touchend', onMouseUp);
+canvas.ontouchmove = onTouchMove;
+canvas.ontouchstart = onTouchDown;
+canvas.ontouchend = onTouchUp;

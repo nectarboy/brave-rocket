@@ -5,7 +5,7 @@ class GuiTitleScreenFooter {
         this.x = canvas.width/2;
         this.y = canvas.height - this.yOffset;
 
-        this.text = new Text(0,0, ['2021 - 1.2'], 12, '#ffffff', true);
+        this.text = new Text(0,0, ['2021 - 1.2.2'], 12, '#ffffff', true);
     }
 
     updateText() {
