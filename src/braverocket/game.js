@@ -1,9 +1,4 @@
-// 1.1
-
-window.localStorage.braverocket ||= {
-    selectedskin: 0
-};
-const gameLocalStorage = window.localStorage.braverocket;
+// 1.2.4
 
 var globalpaused = false;
 var paused = false;

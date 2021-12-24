@@ -87,10 +87,11 @@ const particleSpawners = {
         return particle;
     },
 
-    boom: function(x, y) {
-        var animspeed = randInt(4, 6);
+    boom: function(x, y, vy) {
+        var animspeed = 8;
+        var vx = randNum(1, -1);
 
-        var particle = new Particle(x,y, 32,24, 0,0,1, 64,0, animspeed,PARTICLE_1_LENGTH);
+        var particle = new Particle(x,y, 32,24, vx,vy,0.9, 64,0, animspeed,PARTICLE_1_LENGTH);
         particle.sprite.scale = 3;
         particle.updateSprite();
 

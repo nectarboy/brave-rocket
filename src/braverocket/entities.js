@@ -39,14 +39,14 @@ class Player extends Entity {
         addEvent(() => {
             if (etick === DEATHSCROLL_DELAY) {
                 // boom
-                entities.push(particleSpawners.boom(x, y));
+                entities.push(particleSpawners.boom(x, y, this.vy*0.5));
 
                 // explosion
                 var explosionammount = PLAYER_EXPLOSION_MIN + velrange * (PLAYER_EXPLOSION_MAX - PLAYER_EXPLOSION_MIN);
                 for (var i = 0; i < explosionammount; i++) {
                     entities.push(particleSpawners.combust(x, y));
                 }
-
+            
                 this.sprite.invisible = true;
                 this.deathscroll = this.vy * DEATHSCROLL_VEL_MUL;
                 return true;

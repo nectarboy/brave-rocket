@@ -22,14 +22,15 @@ const loopStates = {
             updateEntities();
 
             // gui
-            gui.braverocket_logo.update();
+            gui.braverocketlogo.update();
+            gui.logonumber.update();
 
             // playing
             if (!incutscene && controller.clicking) {
                 incutscene = true;
 
                 var etick = 0;
-                gui.braverocket_logo.shouldanimate = false;
+                gui.braverocketlogo.shouldanimate = false;
                 addEvent(() => {
                     if (etick === MAINGAME_DELAY) {
                         prepareMainGame();
@@ -41,8 +42,8 @@ const loopStates = {
                         // player
                         player.bottomoffset -= player.bottomoffsetRate * (player.bottomoffset - PLAYER_MAINGAME_BOTTOM_OFFSET);
                         // gui
-                        gui.braverocket_logo.y -= gui.braverocket_logo.offstageRate * (gui.braverocket_logo.y - gui.braverocket_logo.offstageY);
-                        gui.titlescreen_footer.text.invisible = true;
+                        gui.braverocketlogo.y -= gui.braverocketlogo.stageExitRate * (gui.braverocketlogo.y - gui.braverocketlogo.offstageY);
+                        gui.titlescreenfooter.text.invisible = true;
 
                         return false;
                     }
@@ -55,8 +56,9 @@ const loopStates = {
             drawPlayer();
 
             // gui
-            gui.braverocket_logo.draw();
-            gui.titlescreen_footer.draw();
+            gui.braverocketlogo.draw();
+            gui.logonumber.draw();
+            gui.titlescreenfooter.draw();
         }
     },
 

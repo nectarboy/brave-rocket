@@ -5,7 +5,7 @@ class GuiTitleScreenFooter {
         this.x = canvas.width/2;
         this.y = canvas.height - this.yOffset;
 
-        this.text = new Text(0,0, ['2021 - 1.2.3'], 12, '#ffffff', true);
+        this.text = new Text(0,0, ['2021 - 1.2.4'], 12, '#ffffff', true);
     }
 
     updateText() {
@@ -20,19 +20,22 @@ class GuiTitleScreenFooter {
 
 class GuiBraveRocketLogo {
     constructor() {
-        this.offstageY = -75;
-        this.offstageRate = 0.05;
+        this.offstageY = -90;
+        this.stageExitRate = 0.05;
+        this.offstage = true;
+        this.beginningSindiv = 30;
+        this.endSindiv = 20;
 
         this.sprite = new WholeSprite(assets['braverocket_logo'], 0,0, 2);
 
         this.x = canvas.width/2;
         this.y = this.offstageY;
 
-        this.yPositions = [90, 65];
-        this.step = 0;
-        this.tick = 0;
-        this.rate = 45;
-        this.animationMul = 0.05;
+        this.yposition = 75;
+        this.ydip = 90;
+        this.sincounter = 0;
+
+        this.sindiv = this.beginningSindiv;
 
         this.shouldanimate = true;
     };
@@ -40,19 +43,18 @@ class GuiBraveRocketLogo {
     updateAnimation() {
         if (!this.shouldanimate) return;
 
-        if (this.tick >= this.rate) {
-            this.tick = 0;
-
-            this.step++;
-            if (this.step >= this.yPositions.length) {
-                this.step = 0;
+        if (this.offstage) {
+            this.y = this.offstageY + (Math.sin(this.sincounter/this.sindiv) * (this.ydip - this.offstageY));
+            if (this.y >= this.ydip - 1) {
+                this.offstage = false;
+                this.sindiv = this.endSindiv;
             }
         }
         else {
-            this.tick++;
+            this.y = this.yposition + (Math.sin(this.sincounter/this.sindiv) * (this.ydip - this.yposition));
         }
 
-        this.y += this.animationMul * (this.yPositions[this.step] - this.y);
+        this.sincounter++;
     }
 
     update() {
@@ -68,15 +70,63 @@ class GuiBraveRocketLogo {
     }
 }
 
+class GuiLogoNumber {
+    constructor() {
+        this.logoOffX = 60;
+        this.logoOffY = 40;
+
+        this.sprite = new WholeSprite(assets['number_two'], 0,0, 2);
+
+        this.x = 0;
+        this.y = 0;
+
+        this.sincounter = 0;
+        this.sindiv = 12;
+        this.sinX = 0;
+        this.sinY = 0;
+        this.circleradius = 10;
+    };
+
+    updateAnimation() {
+        const sininput = this.sincounter / this.sindiv;
+        this.sinX = Math.sin(sininput) * this.circleradius;
+        this.sinY = Math.cos(sininput) * this.circleradius;
+
+        this.sincounter++;
+    }
+
+    updatePosition() {
+        this.x = gui.braverocketlogo.x + this.logoOffX + this.sinX;
+        this.y = gui.braverocketlogo.y + this.logoOffY + this.sinY;
+    }
+
+    update() {
+        this.updatePosition();
+        this.updateAnimation();
+    }
+
+    updateSprite() {
+        this.sprite.centerOnto(this.x, this.y, 0, 0);
+    }
+    draw() {
+        this.updateSprite();
+        bufferFrame(this.sprite);
+    }
+}
+
 var gui = {
-    braverocket_logo: null,
-    titlescreen_footer: null
+    braverocketlogo: null,
+    logonumber: null,
+    titlescreenfooter: null
 };
 
 function resetGui() {
-    gui.braverocket_logo = new GuiBraveRocketLogo();
-    gui.braverocket_logo.updateSprite();
+    gui.braverocketlogo = new GuiBraveRocketLogo();
+    gui.braverocketlogo.updateSprite();
 
-    gui.titlescreen_footer = new GuiTitleScreenFooter();
-    gui.titlescreen_footer.updateText();
+    gui.logonumber = new GuiLogoNumber();
+    gui.logonumber.updateSprite();
+
+    gui.titlescreenfooter = new GuiTitleScreenFooter();
+    gui.titlescreenfooter.updateText();
 }
