@@ -16,6 +16,8 @@ class Player extends Entity {
         this.particletick = 0;
         this.particlerate = 3;
 
+        this.wasclicking = false;
+
         this.sprite = new Sprite(assets['entities'], 0,0, 16,16, 0, 2);
     }
 
@@ -29,30 +31,46 @@ class Player extends Entity {
         this.deathscroll *= DEATHSCROLL_SLOWDOWN_MUL;
     }
     deathAnimation() {
-        this.sprite.invisible = true;
-
         var x = this.x + this.w*0.5;
         var y = this.y + this.h*0.5;
         var velrange = 1 - (this.vy - this.maxVy) / (this.minVy - this.maxVy);
 
-        // explosion
-        var explosionammount = PLAYER_EXPLOSION_MIN + velrange * (PLAYER_EXPLOSION_MAX - PLAYER_EXPLOSION_MIN);
-        for (var i = 0; i < explosionammount; i++) {
-            entities.push(particleSpawners.combust(x, y));
-        }
+        var etick = 0;
+        addEvent(() => {
+            if (etick === DEATHSCROLL_DELAY) {
+                // boom
+                entities.push(particleSpawners.boom(x, y));
 
-        // boom
-        entities.push(particleSpawners.boom(x, y));
+                // explosion
+                var explosionammount = PLAYER_EXPLOSION_MIN + velrange * (PLAYER_EXPLOSION_MAX - PLAYER_EXPLOSION_MIN);
+                for (var i = 0; i < explosionammount; i++) {
+                    entities.push(particleSpawners.combust(x, y));
+                }
+
+                this.sprite.invisible = true;
+                this.deathscroll = this.vy * DEATHSCROLL_VEL_MUL;
+                return true;
+            }
+            else {
+                etick++;
+                return false;
+            }
+        });
+
+        this.deathscroll = 0;
     }
     die() {
         if (GODMODE || this.dead) return;
         this.dead = true;
 
-        this.deathscroll = this.vy * DEATHSCROLL_VEL_MUL;
         this.deathAnimation();
+        this.wasclicking = controller.clicking;
     }
     checkShouldRestartGame() {
-        if (!controller.clicking) return;
+        if (this.wasclicking || !controller.clicking) {
+            this.wasclicking = controller.clicking;
+            return;
+        }
 
         gameReset();
         prepareMainGame();
