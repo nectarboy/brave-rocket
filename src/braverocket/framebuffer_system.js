@@ -1,4 +1,4 @@
-var framebuffer = [];
+const framebuffer = [];
 function flushFrameBuffer() {
     framebuffer.length = 0;
 }

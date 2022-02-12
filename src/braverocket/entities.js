@@ -18,12 +18,17 @@ class Player extends Entity {
 
         this.wasclicking = false;
 
-        this.sprite = new Sprite(assets['entities'], 0,0, 16,16, 0, 2);
+        this.sprite = new Sprite(assets['entities'], 0,0, 16,16, 0,0, 2);
     }
 
     resetStartPosition() {
         this.resetstartpositionflag = false;
         this.y = canvas.height - PLAYER_TITLESCREEN_BOTTOM_OFFSET - this.h;
+    }
+
+    prepareMainGameGui() {
+        flushGuiBuffer();
+        //bufferGui('')
     }
 
     deathScrollCamera() {
@@ -39,13 +44,26 @@ class Player extends Entity {
         addEvent(() => {
             if (etick === DEATHSCROLL_DELAY) {
                 // boom
-                entities.push(particleSpawners.boom(x, y, this.vy*0.5));
+                entities.push(particleSpawners.boom(x, y, this.vy * DEATHSCROLL_VEL_MUL));
 
                 // explosion
                 var explosionammount = PLAYER_EXPLOSION_MIN + velrange * (PLAYER_EXPLOSION_MAX - PLAYER_EXPLOSION_MIN);
                 for (var i = 0; i < explosionammount; i++) {
                     entities.push(particleSpawners.combust(x, y));
                 }
+
+                // camera shake
+                cameraShake(this.vy, 0.9);
+
+                // game over screen
+                var eetick = 0;
+                addEvent(() => {
+                    if (eetick++ === 25) {
+                        bufferGui('gameoverscreen');
+                        return true;
+                    }
+                    return false;
+                });
             
                 this.sprite.invisible = true;
                 this.deathscroll = this.vy * DEATHSCROLL_VEL_MUL;
@@ -66,6 +84,11 @@ class Player extends Entity {
         this.deathAnimation();
         this.wasclicking = controller.clicking;
     }
+    revive() {
+        this.dead = false;
+        this.sprite.invisible = false;
+        this.prepareMainGameGui();
+    }
     checkShouldRestartGame() {
         if (this.wasclicking || !controller.clicking) {
             this.wasclicking = controller.clicking;
@@ -73,7 +96,7 @@ class Player extends Entity {
         }
 
         gameReset();
-        prepareMainGame();
+        prepareLoopState(1);
     }
 
     updateParticles() {
@@ -158,11 +181,12 @@ class Cloud extends Entity {
         this.sprites.length = 0;
 
         var centerSpritePieceAmt = Math.floor(this.w / CLOUD_SPRITE_W) - 2; // we subtract 2 because 2 ends on cloud
-        this.sprites.push(new Sprite(assets['entities'], 0,0, 8,16, 2, 2)); // left
+
+        this.sprites.push(new Sprite(assets['entities'], 0,0, 8,16, 16,0, 2)); // left
         for (var i = 0; i < centerSpritePieceAmt; i++) {
-            this.sprites.push(new Sprite(assets['entities'], 0,0, 8,16, 3, 2)); // middle
+            this.sprites.push(new Sprite(assets['entities'], 0,0, 8,16, 24,0, 2)); // middle
         }
-        this.sprites.push(new Sprite(assets['entities'], 0,0, 8,16, 4, 2)); // right
+        this.sprites.push(new Sprite(assets['entities'], 0,0, 8,16, 32,0, 2)); // right
     }
 
     checkTouchingPlayer() {
@@ -217,6 +241,7 @@ class FloorProp extends Entity {
     }
 
     updateSprite() {
+        this.sprite.x = correctCamX(this.x);
         this.sprite.y = correctCamY(this.y);
     }
     draw() {

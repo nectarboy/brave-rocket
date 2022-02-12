@@ -1,16 +1,8 @@
 var incutscene = false;
 
-function prepareTitleScreen() {
-    loopstate = 0;
-
-    incutscene = false;
-    entities.push(spawnFloorProp());
-}
-function prepareMainGame() {
-    loopstate = 1;
-
-    incutscene = false;
-    player.bottomoffset = PLAYER_MAINGAME_BOTTOM_OFFSET;
+function prepareLoopState(id) {
+    loopstate = id;
+    loopStates[loopstate].prepare();
 }
 
 const loopStates = {
@@ -22,29 +14,27 @@ const loopStates = {
             updateEntities();
 
             // gui
-            gui.braverocketlogo.update();
-            gui.logonumber.update();
+            updateGuiBuffer();
 
             // playing
             if (!incutscene && controller.clicking) {
                 incutscene = true;
 
                 var etick = 0;
-                gui.braverocketlogo.shouldanimate = false;
+                gui.braverocketlogo.obj.shouldanimate = false;
                 addEvent(() => {
-                    if (etick === MAINGAME_DELAY) {
-                        prepareMainGame();
+                    if (etick++ === MAINGAME_DELAY) {
+                        prepareLoopState(1);
                         return true;
                     }
                     else {
-                        etick++;
-
                         // player
                         player.bottomoffset -= player.bottomoffsetRate * (player.bottomoffset - PLAYER_MAINGAME_BOTTOM_OFFSET);
-                        // gui
-                        gui.braverocketlogo.y -= gui.braverocketlogo.stageExitRate * (gui.braverocketlogo.y - gui.braverocketlogo.offstageY);
-                        gui.titlescreenfooter.text.invisible = true;
 
+                        // gui
+                        gui.braverocketlogo.obj.y -= gui.braverocketlogo.obj.stageExitRate * (gui.braverocketlogo.obj.y - gui.braverocketlogo.obj.offstageY);
+                        gui.titlescreenfooter.obj.text.invisible = true;
+                        gui.clicktoplay.obj.sprite.invisible = true;
                         return false;
                     }
                 });
@@ -54,11 +44,16 @@ const loopStates = {
             drawBackgrounds();
             drawEntities();
             drawPlayer();
+            drawGuiBuffer();
+        },
+        prepare: function() {
+            incutscene = false;
 
-            // gui
-            gui.braverocketlogo.draw();
-            gui.logonumber.draw();
-            gui.titlescreenfooter.draw();
+            flushGuiBuffer();
+            bufferGui('braverocketlogo');
+            bufferGui('logonumber');
+            bufferGui('clicktoplay');
+            bufferGui('titlescreenfooter');
         }
     },
 
@@ -66,7 +61,8 @@ const loopStates = {
     1: {
         update: function() {
             checkCloudSpawn();
-            
+                
+            updateGuiBuffer();
             updatePlayer();
             updateEntities();
         },
@@ -74,6 +70,13 @@ const loopStates = {
             drawBackgrounds();
             drawEntities();
             drawPlayer();
+            drawGuiBuffer();
+        },
+        prepare: function() {
+            incutscene = false;
+            player.bottomoffset = PLAYER_MAINGAME_BOTTOM_OFFSET;
+
+            flushGuiBuffer();
         }
     }
 };

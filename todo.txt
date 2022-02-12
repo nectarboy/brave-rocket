@@ -1,11 +1,11 @@
-stop sprite system using 8x8
-gui
+(done) stop sprite system using 8x8
+(wip) gui
 velocity meter + score n stuff
 balancing ?
-death screen
+(wip) death screen
 bird enemy
 more obstacles
 currency ? collectibles ? secrets ???
-MORE SPACE
-BETTER BG
-easter eggs :3
+(wip) MORE SPACE
+(wip) BETTER BG
+(wip) easter eggs :3

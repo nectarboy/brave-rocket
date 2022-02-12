@@ -1,4 +1,4 @@
-// 1.2.4
+var gameversion = '0.3.0';
 
 var globalpaused = false;
 var paused = false;
@@ -42,7 +42,6 @@ function gameDraw() {
 }
 function gameReset() {
     resetflag = false;
-    loopstate = 0;
     tick = 0;
     //flushFrameBuffer();
 
@@ -56,9 +55,24 @@ function gameReset() {
     resetEntities();
     resetBackgrounds();
     resetGui();
-    prepareTitleScreen();
-
+    prepareLoopState(0);
     DEBUGRESET();
+
+    // EXTRA STUFF
+    // earthquake mode
+    if (EARTHQUAKEMODE) {
+        var etick = 0;
+        addEvent(() => {
+            if (etick++ === 6) {
+                etick = 0;
+                cameraShake(20, 0.9);
+            }
+            return false;
+        });
+    }
+
+    // floor prop
+    entities.push(spawnFloorProp());
 }
 
 function drawFrame() {
@@ -99,13 +113,13 @@ function DEBUGRESET() {
 }
 
 function DEBUGUPDATE() {
-    debugThing.x = controller.x;
-    debugThing.y = controller.y;
+    // debugThing.x = controller.x;
+    // debugThing.y = controller.y;
     
-    debugThing.sprite.centerOnto(debugThing.x, debugThing.y, debugThing.w, debugThing.h);
+    // debugThing.sprite.centerOnto(debugThing.x, debugThing.y, debugThing.w, debugThing.h);
 }
 
 function DEBUGDRAW() {
-    printText([tick]);
-    bufferFrame(debugThing.sprite);
+    //printText([tick]);
+    // bufferFrame(debugThing.sprite);
 }

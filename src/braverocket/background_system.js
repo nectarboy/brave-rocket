@@ -1,18 +1,20 @@
-class BackgroundObj {
-    constructor(assetname, x, y, scale) {
-        this.sprite = new WholeSprite(assets[assetname], 0,0, scale);
+class BgObj {
+    constructor(assetname, offset, scale) {
+        this.sprite = new Sprite(assets[assetname], 0,0, BG_PORTION_W,assets[assetname].height, 0,0, scale);
 
-        this.x = x;
-        this.y = y;
-
+        this.offset = offset;
+        this.w = this.sprite.scale * this.sprite.w;
         this.h = this.sprite.scale * this.sprite.h;
     }
 
     draw() {
-        this.y = (canvas.height - this.h) - camY * ((this.h - canvas.height) / canvas.height * BG_PARALLAX);
+        var y = (canvas.height-this.h) - camY * (this.h / (canvas.height*2) * BG_PARALLAX);
+        var bgportion = 0|((y - (this.offset * this.h) + (this.h - canvas.height)) / this.h);
+        y -= bgportion * this.h;
 
-        this.sprite.x = this.x;
-        this.sprite.y = this.y;
+        this.sprite.x = camX;
+        this.sprite.y = y;
+        this.sprite.offset = bgportion;
         bufferFrame(this.sprite);
     }
 }
@@ -21,14 +23,15 @@ const backgrounds = [];
 function resetBackgrounds() {
     backgrounds.length = 0;
 
-    backgrounds.push(new BackgroundObj('background_bottom', 0,0, 2));
-    backgrounds.push(new BackgroundObj('background_top', 0,0, 2));
-
-    for (var i = 0; i < backgrounds.length; i++)
-        backgrounds[i].y = canvas.height - backgrounds[i].sprite.asset.height;
+    const scale = 2;
+    backgrounds.push(new BgObj('bg_bottom', 0, 2));
+    backgrounds.push(new BgObj('bg_bottom', -1, 2));
+    backgrounds.push(new BgObj('bg_top', 0, 2));
+    backgrounds.push(new BgObj('bg_top', -1, 2));
 }
 function drawBackgrounds() {
     for (var i = 0; i < backgrounds.length; i++) {
+        backgrounds[i].draw();
         backgrounds[i].draw();
     }
 }
