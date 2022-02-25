@@ -9,8 +9,9 @@ const loopStates = {
     // title screen
     0: {
         update: function() {
-            player.resetstartpositionflag = true;
             updatePlayer();
+            player.resetStartPosition();
+            player.updateCamera();
             updateEntities();
 
             // gui
@@ -29,7 +30,7 @@ const loopStates = {
                     }
                     else {
                         // player
-                        player.bottomoffset -= player.bottomoffsetRate * (player.bottomoffset - PLAYER_MAINGAME_BOTTOM_OFFSET);
+                        player.offy -= player.offyrate * (player.offy - PLAYER_MAINGAME_BOTTOM_OFFSET);
 
                         // gui
                         gui.braverocketlogo.obj.y -= gui.braverocketlogo.obj.stageExitRate * (gui.braverocketlogo.obj.y - gui.braverocketlogo.obj.offstageY);
@@ -74,9 +75,10 @@ const loopStates = {
         },
         prepare: function() {
             incutscene = false;
-            player.bottomoffset = PLAYER_MAINGAME_BOTTOM_OFFSET;
-
             flushGuiBuffer();
+            
+            player.offy = PLAYER_MAINGAME_BOTTOM_OFFSET;
+            player.prepareForMainGame();
         }
     }
 };

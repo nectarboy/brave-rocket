@@ -1,4 +1,4 @@
-var gameversion = '0.3.0';
+var gameversion = '0.3.1';
 
 var globalpaused = false;
 var paused = false;
@@ -22,8 +22,8 @@ function correctCamY(y) {
 
 // game logic
 function gameUpdate() {
-    loopStates[loopstate].update();
     updateEvents();
+    loopStates[loopstate].update();
     DEBUGUPDATE();
 
     tick++;
@@ -67,7 +67,19 @@ function gameReset() {
                 etick = 0;
                 cameraShake(20, 0.9);
             }
-            return false;
+            return !EARTHQUAKEMODE;
+        });
+    }
+
+    // dog rain mode
+    if (COINRAINMODE) {
+        var etick = 0;
+        addEvent(() => {
+            if (etick++ === 6) {
+                etick = 0;
+                entities.push(spawnFallingCoin());
+            }
+            return !COINRAINMODE;
         });
     }
 

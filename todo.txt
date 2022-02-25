@@ -1,5 +1,6 @@
 (done) stop sprite system using 8x8
 (wip) gui
+(wip) meteors (meteor showers ???)
 velocity meter + score n stuff
 balancing ?
 (wip) death screen

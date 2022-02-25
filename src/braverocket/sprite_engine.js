@@ -38,7 +38,7 @@ class Sprite {
         if (this.rotation) {
             ctx.save();
             ctx.translate(Math.round(this.x + w*0.5), Math.round(this.y + h*0.5));
-            ctx.rotate(this.rotdeg * Math.PI / 180);
+            ctx.rotate((this.rotdeg) * Math.PI / 180);
 
             ctx.drawImage(
                 this.asset,
