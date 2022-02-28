@@ -41,7 +41,7 @@ gui.logonumber = {
         }
         draw() {
             this.updateSprite();
-            bufferFrame(this.sprite);
+            bufferFrame(this.sprite, 2);
         }
     }
 };

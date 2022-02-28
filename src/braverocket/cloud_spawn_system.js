@@ -21,19 +21,23 @@ function cloudSpawnEvent() {
         return;
 
     // meteor
-    if (Math.random() <= METEOR_CHANCE)
+    if (Math.random() <= METEOR_CHANCE) {
         entities.push(spawnMeteor());
+    }
     // cloud
-    else
+    else {
         entities.push(spawnCloud());
+    }
 
     // TODO - meteor shower
 
     // special spawns
     var fallingcoinchance = FALLINGCOIN_CHANCE_MIN + (FALLINGCOIN_CHANCE_MAX - FALLINGCOIN_CHANCE_MIN) * (1-player.getVelRange());
     //console.log(fallingcoinchance.toFixed(3))
-    if (Math.random() <= 0.5)
+    if (Math.random() <= fallingcoinchance) {
         entities.push(spawnFallingCoin());
+        //playSound('sfx_fallingcoinfall');
+    }
 }
 function checkCloudSpawn() {
     if (cloudTick >= currentSpawnTick) {

@@ -4,6 +4,7 @@ function spawnPlayer() {
     player.offy = PLAYER_TITLESCREEN_BOTTOM_OFFSET;
     player.resetStartPosition();
     player.updateSprite();
+    player.updateCamera();
         
     return player;
 }
@@ -20,7 +21,7 @@ function spawnCloud() {
 
 function spawnMeteor() {
     var meteor = new Meteor(0, 0);
-    meteor.fakex = randInt(canvas.width/2, canvas.width);
+    meteor.fakex = randInt(meteor.w, canvas.width);
     meteor.fakey = -meteor.h * 2;
     meteor.updateSprite();
 

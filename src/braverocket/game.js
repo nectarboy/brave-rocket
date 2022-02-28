@@ -1,4 +1,4 @@
-var gameversion = '0.3.1';
+var gameversion = '0.4.0';
 
 var globalpaused = false;
 var paused = false;
@@ -28,9 +28,9 @@ function gameUpdate() {
 
     tick++;
 
-    if (resetflag) {
-        gameReset();
-    }
+    // if (resetflag) {
+    //     gameReset();
+    // }
 }
 function gameDraw() {
     if (requestedframe) return;
@@ -53,6 +53,7 @@ function gameReset() {
     resetCloudSpawn();
     resetPlayer();
     resetEntities();
+    resetParticles();
     resetBackgrounds();
     resetGui();
     prepareLoopState(0);
@@ -81,6 +82,11 @@ function gameReset() {
             }
             return !COINRAINMODE;
         });
+    }
+
+    // meteor shower mode
+    if (METEORSHOWERMODE) {
+        METEOR_CHANCE = 1;
     }
 
     // floor prop

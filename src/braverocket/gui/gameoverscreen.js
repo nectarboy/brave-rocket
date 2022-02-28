@@ -48,10 +48,10 @@ gui.gameoverscreen = {
         }
         draw() {
             this.updateSprite();
-            bufferFrame(this.sprite);
-            bufferFrame(this.flewtext);
-            bufferFrame(this.scoretext);
-            bufferFrame(this.yousawtext);
+            bufferFrame(this.sprite, 2);
+            bufferFrame(this.flewtext, 2);
+            bufferFrame(this.scoretext, 2);
+            bufferFrame(this.yousawtext, 2);
         }
     }
 };

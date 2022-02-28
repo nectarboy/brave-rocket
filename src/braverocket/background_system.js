@@ -15,7 +15,7 @@ class BgObj {
         this.sprite.x = camX;
         this.sprite.y = y;
         this.sprite.offset = bgportion;
-        bufferFrame(this.sprite);
+        bufferFrame(this.sprite, 0);
     }
 }
 

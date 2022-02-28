@@ -1,0 +1,11 @@
+layers.txt
+
+
+2 - falling coin --> explosion particles --> gui
+1 - entities --> player (& player particles)
+0 - bg --> floorprop ent, falling coin (fading), --> normal particles
+
+
+my prefered order of buffering :3 (layers still applied)
+bg -> entities -> particles -> player -> gui
+this minimizes use of layers

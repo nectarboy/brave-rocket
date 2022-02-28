@@ -1,14 +1,22 @@
 const framebuffer = [];
-function flushFrameBuffer() {
-    framebuffer.length = 0;
+for (var i = 0; i < FRAMEBUFFER_LAYERS; i++) {
+    framebuffer[i] = [];
 }
-function bufferFrame(obj) {
-    framebuffer.push(obj);
+
+function flushFrameBuffer() {
+    for (var i = 0; i < FRAMEBUFFER_LAYERS; i++) {
+        framebuffer[i].length = 0;
+    }
+}
+function bufferFrame(obj, layer) {
+    framebuffer[layer].push(obj);
 }
 
 function drawFrameBuffer() {
-    for (var i = 0; i < framebuffer.length; i++) {
-        framebuffer[i].draw(ctx);
+    for (var i = 0; i < FRAMEBUFFER_LAYERS; i++) {
+        for (var ii = 0; ii < framebuffer[i].length; ii++) {
+            framebuffer[i][ii].draw(ctx);
+        }
     }
 
     // DEBUG HITBOX

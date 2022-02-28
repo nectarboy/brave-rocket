@@ -1,4 +1,6 @@
 (done) stop sprite system using 8x8
+(done) layered framebuffering
+(done) particle pooling
 (wip) gui
 (wip) meteors (meteor showers ???)
 velocity meter + score n stuff

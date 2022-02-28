@@ -12,9 +12,8 @@ const loopStates = {
             updatePlayer();
             player.resetStartPosition();
             player.updateCamera();
+            updateParticles();
             updateEntities();
-
-            // gui
             updateGuiBuffer();
 
             // playing
@@ -44,6 +43,7 @@ const loopStates = {
         draw: function() {
             drawBackgrounds();
             drawEntities();
+            drawParticles();
             drawPlayer();
             drawGuiBuffer();
         },
@@ -63,13 +63,15 @@ const loopStates = {
         update: function() {
             checkCloudSpawn();
                 
-            updateGuiBuffer();
             updatePlayer();
+            updateParticles();
             updateEntities();
+            updateGuiBuffer();
         },
         draw: function() {
             drawBackgrounds();
             drawEntities();
+            drawParticles();
             drawPlayer();
             drawGuiBuffer();
         },

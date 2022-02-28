@@ -10,7 +10,7 @@ gui.debugtext = {
         updateSprite() {}
 
         draw() {
-            bufferFrame(this.text);
+            bufferFrame(this.text, 2);
         }
     }
 };

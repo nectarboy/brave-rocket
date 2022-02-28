@@ -39,7 +39,7 @@ class Player extends Entity {
         this.inmaingame = true;
 
         flushGuiBuffer();
-        bufferGui('debugtext');
+        //bufferGui('debugtext');
     }
 
     deathScrollCamera() {
@@ -54,13 +54,13 @@ class Player extends Entity {
         var etick = 0;
         addEvent(() => {
             if (etick === DEATHSCROLL_DELAY) {
-                // boom
-                entities.push(particleSpawners.boom(x, y, this.vy * DEATHSCROLL_VEL_MUL));
-
                 // explosion
                 for (var i = 0; i < this.camerashake.explosionammount; i++) {
-                    entities.push(particleSpawners.combust(x, y));
+                    particleSpawners.combust(x,y, 2,true);
                 }
+
+                // boom
+                particleSpawners.boom(x, y, this.vy * DEATHSCROLL_VEL_MUL, 2,true);
 
                 // camera shake
                 cameraShake(this.camerashake.intensity, this.camerashake.durability);
@@ -83,6 +83,7 @@ class Player extends Entity {
             
                 this.sprite.invisible = true;
                 this.deathscroll = this.vy * DEATHSCROLL_VEL_MUL;
+                this.vy = this.minVy;
                 return true;
             }
             else {
@@ -104,9 +105,14 @@ class Player extends Entity {
         return true;
     }
     revive() {
+        if (!this.dead)
+            return;
+
         this.dead = false;
         this.sprite.invisible = false;
         this.prepareForMainGame();
+
+        //playSound('sfx_revive');
     }
     checkShouldRestartGame() {
         if (this.wasclicking || !controller.clicking) {
@@ -168,8 +174,8 @@ class Player extends Entity {
             var velrange = this.getVelRange();
             var fireCharOffset = randNum(velrange*0.1, velrange*0.5);
             var smokeCharOffset = randNum(0, velrange*0.75);
-            entities.push(particleSpawners.smoke(x, y, smokeCharOffset, 1));
-            entities.push(particleSpawners.fire(x, y, fireCharOffset, 1));
+            particleSpawners.smoke(x,y, smokeCharOffset,1, 1,true);
+            particleSpawners.fire(x,y, fireCharOffset,1, 1,true);
         }
         else {
             this.particletick++;
@@ -222,8 +228,8 @@ class Player extends Entity {
             this.deathScrollCamera();
         }
 
-        if (this.inmaingame)
-            gui.debugtext.obj.text.text = this.getLandmarkString();
+        //if (this.inmaingame)
+        //    gui.debugtext.obj.text.text = this.getLandmarkString();
     }
 
     updateSprite() {
@@ -231,7 +237,7 @@ class Player extends Entity {
     }
     draw() {
         this.updateSprite();
-        bufferFrame(this.sprite);
+        bufferFrame(this.sprite, 1);
     }
 }
 
@@ -286,9 +292,9 @@ class Cloud extends Entity {
     draw() {
         this.updateSprite();
         for (var i = 0; i < this.sprites.length; i++) {
-            bufferFrame(this.sprites[i]);
+            bufferFrame(this.sprites[i], 1);
         }
-        //bufferFrame(this.sprites[0]); // i like the bugged version more lmao
+        //bufferFrame(this.sprites[0], 1); // i like the bugged version more lmao
     }
 }
 
@@ -343,11 +349,11 @@ class Meteor extends Entity {
             this.particletick = 0;
 
             var x = this.fakex + this.w*0.5;
-            var y = this.sprite.y;
+            var y = this.fakey;
             var smokeCharOffset = randNum(0.5, 0.75);
             var fireCharOffset = randNum(0.1, 0.5);
-            entities.push(particleSpawners.smoke(x, y, smokeCharOffset, -1, false));
-            entities.push(particleSpawners.fire(x, y, fireCharOffset, -1, false));
+            particleSpawners.smoke(x,y, smokeCharOffset,-1, 0,false);
+            particleSpawners.fire(x,y, fireCharOffset,-1, 0,false);
         }
     }
 
@@ -364,13 +370,14 @@ class Meteor extends Entity {
     }
     draw() {
         this.updateSprite();
-        bufferFrame(this.sprite);
+        bufferFrame(this.sprite, 1);
     }
 }
 
 class FallingCoin extends Entity {
     constructor(x, y) {
         super(0, 0, 32, 32);
+        this.layer = 2;
         this.sprite = new Sprite(assets['entities'], 0,0, 16,16, 0,16, 2);
         this.sprite.rotation = true;
 
@@ -386,6 +393,11 @@ class FallingCoin extends Entity {
         this.vy = randNum(2, 4);
     }
 
+    beCollected() {
+        this.collected = true;
+        this.vy = this.bouncevy;
+        this.layer = 0;
+    }
     collectedAnimation() {
         this.vy += this.bounceay;
 
@@ -405,8 +417,7 @@ class FallingCoin extends Entity {
     }
     checkTouchingPlayer() {
         if (!player.dead && this.insideEnt(player)) {
-            this.collected = true;
-            this.vy = this.bouncevy
+            this.beCollected();
             //cameraShake(5, 0.9);
         }
     }
@@ -440,7 +451,7 @@ class FallingCoin extends Entity {
     }
     draw() {
         this.updateSprite();
-        bufferFrame(this.sprite);
+        bufferFrame(this.sprite, this.layer);
     }
 }
 
@@ -467,6 +478,6 @@ class FloorProp extends Entity {
     }
     draw() {
         this.updateSprite();
-        bufferFrame(this.sprite);
+        bufferFrame(this.sprite, 0);
     }
 }

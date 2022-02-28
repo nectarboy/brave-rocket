@@ -21,7 +21,7 @@ gui.titlescreenfooter = {
         }
         draw() {
             this.updateSprite();
-            bufferFrame(this.text);
+            bufferFrame(this.text, 2);
         }
     }
 };
