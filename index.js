@@ -13,6 +13,8 @@ loadAssets(
         ['number_two', 'image', 'src/braverocket/assets/gfx/number_two.png'],
         ['click_to_play', 'image', 'src/braverocket/assets/gfx/click_to_play.png'],
         ['game_over_screen', 'image', 'src/braverocket/assets/gfx/game_over_screen.png'],
+        ['text_box', 'image', 'src/braverocket/assets/gfx/game_over_screen.png'],
+        ['icons', 'image', 'src/braverocket/assets/gfx/icons.png'],
 
         // sfx
         //['sfx_fallingcoinfall', 'audio', 'src/braverocket/assets/sfx/fallingcoinfall.ogg'],

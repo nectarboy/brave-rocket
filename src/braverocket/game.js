@@ -1,10 +1,9 @@
-var gameversion = '0.4.0';
+var gameversion = '0.4.1';
 
 var globalpaused = false;
-var paused = false;
 var running = false;
 var requestedframe = false;
-var resetflag = false;
+var timeout = null;
 
 // game components
 var loopstate = 0;
@@ -27,6 +26,7 @@ function gameUpdate() {
     DEBUGUPDATE();
 
     tick++;
+    controller.firstclick = false;
 
     // if (resetflag) {
     //     gameReset();
@@ -107,19 +107,30 @@ function requestFrame() {
 }
 
 function gameLoop() {
-    if (globalpaused) return;
+    var before = performance.now();
 
-    gameUpdate();
-    gameDraw();
-    requestFrame();
+    if (!globalpaused) {
+        gameUpdate();
+        gameDraw();
+        requestFrame();
+    }
+
+    var after = performance.now();
+
+    timeout = setTimeout(gameLoop, GAME_INTERVAL - (after-before));
 }
 function gameStart() {
     if (running) return;
     running = true;
 
-    setInterval(() => {
-        gameLoop();
-    }, GAME_INTERVAL);
+    gameLoop();
+}
+function gameStop() {
+    if (!running) return;
+    running = false;
+
+    clearTimeout(timeout);
+    timeout = null;
 }
 
 // DEBUG

@@ -1,7 +1,7 @@
 # <img src='https://github.com/nectarboy/brave-rocket/blob/main/src/assets/icon64.png?raw=true'> Brave Rocket 2
 > The second installment of the highly appraised and worldwide bestseller, Brave Rocket.
 
-!!!! WIP !!!! the little goblins are still [building the game](https://nectarboy.github.io/brave-rocket) ok ? (0.4.0)
+!!!! WIP !!!! the little goblins are still [building the game](https://nectarboy.github.io/brave-rocket) ok ? (0.4.1)
 
 ![mmm](https://github.com/nectarboy/brave-rocket/blob/main/docs/title_screen.png?raw=true)
 ![yum](https://github.com/nectarboy/brave-rocket/blob/main/docs/islands.png?raw=true)

@@ -24,7 +24,6 @@ function drawFrameBuffer() {
     // ctx.strokeRect(player.x-0.5, correctCamY(player.y-0.5), player.w, player.h);
 
     // ctx.strokeStyle = 'red';
-    // for (var i = 0; i < entities.length; i++) {
+    // for (var i = 0; i < entities.length; i++)
     //     ctx.strokeRect(entities[i].x-0.5, correctCamY(entities[i].y-0.5), entities[i].w, entities[i].h);
-    // }
 }

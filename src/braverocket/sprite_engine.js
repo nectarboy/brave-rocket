@@ -87,7 +87,7 @@ class WholeSprite {
         ctx.drawImage(
             this.asset,
             Math.round(this.x), Math.round(this.y),
-            0|(this.scale * this.asset.width), 0|(this.scale * this.asset.height)
+            0|(this.scale * this.w), 0|(this.scale * this.h)
         );
     }
 }

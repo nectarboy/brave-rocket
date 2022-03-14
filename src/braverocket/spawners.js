@@ -39,8 +39,17 @@ function spawnFallingCoin() {
 
 function spawnFloorProp() {
     var floorprop = new FloorProp(0, 0);
-    floorprop.y = player.sprite.y + player.sprite.scale*player.sprite.h;
+    floorprop.y = canvas.height - FLOORPROP_OFFSET;
     floorprop.updateSprite();
 
     return floorprop;
+}
+
+function spawnAnimalProp() {
+    var animalprop = new AnimalProp(0, 0);
+    animalprop.x = -animalprop.w;
+    animalprop.y = canvas.height - FLOORPROP_OFFSET - animalprop.h;
+    animalprop.updateSprite();
+
+    return animalprop;
 }

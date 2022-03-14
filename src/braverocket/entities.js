@@ -2,6 +2,7 @@ class Player extends Entity {
     constructor(x, y) {
         super(x, y, 12, 12);
         this.sprite = new Sprite(assets['entities'], 0,0, 16,16, 0,0, 2);
+        this.layer = 1;
 
         this.minVy = -1; // -1.5
         this.maxVy = -15; // -15
@@ -26,7 +27,6 @@ class Player extends Entity {
             explosionammount: 0
         };
         this.resetstartpositionflag = false;
-        this.wasclicking = false;
         this.fallingcoinscollected = 0;
         this.inmaingame = false;
     }
@@ -97,11 +97,9 @@ class Player extends Entity {
     die() {
         if (GODMODE || this.dead)
             return false;
+
         this.dead = true;
-
         this.deathAnimation();
-        this.wasclicking = controller.clicking;
-
         return true;
     }
     revive() {
@@ -115,10 +113,8 @@ class Player extends Entity {
         //playSound('sfx_revive');
     }
     checkShouldRestartGame() {
-        if (this.wasclicking || !controller.clicking) {
-            this.wasclicking = controller.clicking;
+        if (!controller.firstclick)
             return;
-        }
 
         gameReset();
         prepareLoopState(1);
@@ -148,20 +144,6 @@ class Player extends Entity {
         if (meters < 600) return ['a rock-star', ':D'];
         if (meters < 750) return ['epic space', 'stuff'];
         return ['the void'];
-        
-
-
-        switch (0|(this.getMetersInAir() / 75)) {
-            case 0: return 'the hills';
-            case 1: return 'the clouds';
-            case 2: return 'floating islands';
-            case 3: return 'a tiny cottage';
-            case 4: return 'clumpy clouds';
-            case 5: return 'the night sky';
-
-
-            default: return '8===D';
-        }
     }
 
     updateParticles() {
@@ -224,7 +206,7 @@ class Player extends Entity {
             // }
         }
         else {
-            this.checkShouldRestartGame();
+            //this.checkShouldRestartGame();
             this.deathScrollCamera();
         }
 
@@ -237,7 +219,7 @@ class Player extends Entity {
     }
     draw() {
         this.updateSprite();
-        bufferFrame(this.sprite, 1);
+        bufferFrame(this.sprite, this.layer);
     }
 }
 
@@ -245,19 +227,22 @@ class Cloud extends Entity {
     constructor(x, y) {
         const randW = randInt(CLOUD_MIN_W, CLOUD_MAX_W);
         super(x, y, randW, 8);
+        this.spritescale = 2;
+        this.spritepartwidth = 8;
+
         this.sprites = [];
     }
 
     generateSprites() {
         this.sprites.length = 0;
 
-        var centerSpritePieceAmt = Math.floor(this.w / CLOUD_SPRITE_W) - 2; // we subtract 2 because 2 ends on cloud
+        var centerSpritePieceAmt = Math.floor(this.w/this.spritescale / this.spritepartwidth) + 1; // +1 for safe meaasure
 
-        this.sprites.push(new Sprite(assets['entities'], 0,0, 8,16, 16,0, 2)); // left
+        this.sprites.push(new Sprite(assets['entities'], 0,0, 8,16, 16,0, this.spritescale)); // left
         for (var i = 0; i < centerSpritePieceAmt; i++) {
-            this.sprites.push(new Sprite(assets['entities'], 0,0, 8,16, 24,0, 2)); // middle
+            this.sprites.push(new Sprite(assets['entities'], 0,0, 8,16, 24,0, this.spritescale)); // middle
         }
-        this.sprites.push(new Sprite(assets['entities'], 0,0, 8,16, 32,0, 2)); // right
+        this.sprites.push(new Sprite(assets['entities'], 0,0, 8,16, 32,0, this.spritescale)); // right
     }
 
     checkTouchingPlayer() {
@@ -281,12 +266,13 @@ class Cloud extends Entity {
     }
 
     updateSprite() {
-        var lengthM1 = this.sprites.length - 1;
+        var length = this.sprites.length;
+        var lengthM1 = length - 1;
         
-        this.sprites[0].centerOnto(correctCamX(this.x), correctCamY(this.y), CLOUD_SPRITE_W, this.h);
-        this.sprites[lengthM1].centerOnto(correctCamX(this.x + this.w - CLOUD_SPRITE_W), correctCamY(this.y), CLOUD_SPRITE_W, this.h);
+        this.sprites[0].centerOnto(correctCamX(this.x), correctCamY(this.y), this.spritepartwidth, this.h);
+        this.sprites[lengthM1].centerOnto(correctCamX(this.x + this.w - this.spritepartwidth), correctCamY(this.y), this.spritepartwidth, this.h);
         for (var i = 1; i < lengthM1; i++) {
-            this.sprites[i].centerOnto(correctCamX(this.x + i * (CLOUD_SPRITE_W)), correctCamY(this.y), CLOUD_SPRITE_W, this.h)
+            this.sprites[i].centerOnto(correctCamX(this.x + i * (this.w / length)), correctCamY(this.y), this.spritepartwidth, this.h)
         }
     }
     draw() {
@@ -394,7 +380,12 @@ class FallingCoin extends Entity {
     }
 
     beCollected() {
+        if (this.collected)
+            return;
         this.collected = true;
+
+        this.collected = true;
+        player.fallingcoinscollected++;
         this.vy = this.bouncevy;
         this.layer = 0;
     }
@@ -479,5 +470,61 @@ class FloorProp extends Entity {
     draw() {
         this.updateSprite();
         bufferFrame(this.sprite, 0);
+    }
+}
+
+class AnimalProp extends Entity {
+    constructor(x, y) {
+        const type = randInt(0, 11); // 12 different animals
+        const isbig = (type >= 8);
+        const size = 16 * (isbig+1);
+        const charx = isbig
+            ? 8*16 + size*(type - 8)
+            : type * size;
+
+        super(x, y, size*2, size*2);
+        this.sprite = new Sprite(assets['entities'], 0,0, size,size, charx,48, 2);
+
+        this.ay = 0.2;
+        this.bouncey = -1.5;
+        this.vx = randNum(1, 2.5);
+        this.vy = 0;
+    }
+
+    checkShouldKill() {
+        if (this.x >= canvas.width || this.y >= canvas.height + camY) {
+            this.shouldkill = true;
+            console.log('-- animal ded lol');
+        }
+    }
+
+    updateVelocity() {
+        this.vy += this.ay;
+    }
+    updatePosition() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // collision
+        const floory = canvas.height - FLOORPROP_OFFSET;
+        if (this.y + this.h >= floory) {
+            this.y = floory - this.h;
+            this.vy = this.bouncey;
+        }
+    }
+
+    update() {
+        this.updateVelocity();
+        this.updatePosition();
+        this.checkShouldKill();
+    }
+
+    updateSprite() {
+        this.sprite.x = correctCamX(this.x);
+        this.sprite.y = correctCamY(this.y);
+    }
+    draw() {
+        this.updateSprite();
+        bufferFrame(this.sprite, 1);
     }
 }
