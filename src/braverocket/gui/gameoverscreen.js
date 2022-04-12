@@ -43,7 +43,7 @@ gui.gameoverscreen = {
             // play again
             if (
                 // clicking outside of box
-                (controller.x <= this.x - this.w*0.5 || controller.x >= this.x + this.w ||
+                (controller.x <= this.x || controller.x >= this.x + this.w ||
                 controller.y <= this.y || controller.y >= this.y + this.h)
                 ||
                 // clicking play again button
@@ -54,6 +54,7 @@ gui.gameoverscreen = {
                 // play again
                 gameReset();
                 prepareLoopState(1);
+                controller.firstclick = false;
             }
 
             // quit
@@ -63,8 +64,10 @@ gui.gameoverscreen = {
                 controller.y >= this.y + 58*this.sprite.scale && controller.y <= this.y + 71*this.sprite.scale)
             )
             {
+                // titlescreen
                 gameReset();
                 prepareLoopState(0);
+                controller.firstclick = false;
             }
         }
         

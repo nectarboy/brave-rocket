@@ -44,10 +44,10 @@ gui.braverocketlogo = {
                     break;
                 }
 
-                case 4: { // sliding right --> normal
+                case 4: { // sliding right --> falling down (--> normal)
                     this.x += this.stageEnterRate * (this.xposition - this.x);
                     if (this.x >= this.xposition - 1) {
-                        this.animtype = 1;
+                        this.animtype = 2;
                     }
                     break;
                 }

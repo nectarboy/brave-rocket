@@ -102,6 +102,17 @@ function loadAssets(assetBundle, onFinish) {
                 assets[name].src = src;
                 break;
             }
+            case 'font': {
+                assets[name] = new FontFace(name, `url('${src}')`);
+
+                assets[name].load().then(font => {
+                    document.fonts.add(font);
+                    onAssetLoad();
+                }).catch(e => {
+                    onLoadingError(`error loading font i${i}, details: ${e}`);
+                });
+                break;
+            }
 
             default: {
                 onLoadingError(`unknown asset type '${assetPack[1]}' i${i}`);

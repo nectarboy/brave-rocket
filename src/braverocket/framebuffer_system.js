@@ -1,7 +1,9 @@
 const framebuffer = [];
-for (var i = 0; i < FRAMEBUFFER_LAYERS; i++) {
-    framebuffer[i] = [];
-}
+(function() {
+    for (var i = 0; i < FRAMEBUFFER_LAYERS; i++) {
+        framebuffer[i] = [];
+    }
+})();
 
 function flushFrameBuffer() {
     for (var i = 0; i < FRAMEBUFFER_LAYERS; i++) {

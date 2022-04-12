@@ -1,19 +1,143 @@
 class Player extends Entity {
     constructor(x, y) {
         super(x, y, 12, 12);
+        var player = this;
         this.sprite = new Sprite(assets['entities'], 0,0, 16,16, 0,0, 2);
         this.layer = 1;
 
         this.minVy = -1; // -1.5
         this.maxVy = -15; // -15
         this.offyrate = 0.1;
-        this.particlerate = 3;
         this.titlescreenoff = 80;
         this.maingameoff = 44;
         this.mousetop = 80; // 78
         this.mousebottom = 218;
         this.sizeofameter = 50;
 
+        // animations
+        this.animations = {
+            skin: [
+                // default rocket
+                {
+                    name: ['default', 'rocket'],
+                    description: ['the default rocket we', 'all know and love :)'],
+                    cost: 0,
+                    func: function() {
+                        player.sprite.charx = 0;
+                        player.sprite.chary = 0;
+                    }
+                },
+                // space ship
+                {
+                    name: ['space', 'ship'],
+                    description: ['this one is super duper', 'epic dont you think'],
+                    cost: 4,
+                    func: function() {
+                        player.sprite.charx = 112;
+                        player.sprite.chary = 0;
+                    }
+                },
+                // UFO
+                {
+                    name: ['U.F.O'],
+                    description: ['gigigy gigidy goo. THE', 'ALIENS ARE HERE o_O'],
+                    cost: 4,
+                    func: function() {
+                        player.sprite.charx = 112;
+                        player.sprite.chary = 16;
+                    }
+                },
+                // rainbow balloon
+                {
+                    name: ['rainbow', 'balloon'],
+                    description: ['this cool balloon cycles', 'the colors of the rainbow :D'],
+                    cost: 6,
+                    func: function() {
+                        player.sprite.charx = 128;
+                        player.sprite.chary = 16;
+                    }
+                },
+                // poopcrapper
+                {
+                    name: ['poopcrapper'],
+                    description: ['oh mein got! ich hab', 'poopshitten mein panten!!!'],
+                    cost: 4,
+                    func: function() {
+                        player.sprite.charx = 128;
+                        player.sprite.chary = 0;
+                    }
+                },
+                // missingno
+                {
+                    name: ['MISSINGNO.'],
+                    description: ['this skin just added', 'itself one day idrk tbh'],
+                    cost: 2,
+                    func: function() {
+                        player.sprite.charx = randInt(0, 96);
+                        player.sprite.chary = randInt(0, 64);
+                    }
+                }
+            ],
+
+            particle: [
+                // rocket flame
+                {
+                    name: ['rocket', 'flame'],
+                    description: ['fires always cool', 'dont you think?'],
+                    cost: 0,
+                    func: function(layer=1) {
+                        if (player.particletick++ >= 3) {
+                            player.particletick = 0;
+
+                            var x = player.x + player.w*0.5;
+                            var y = player.sprite.y + camY + player.sprite.scale * player.sprite.h;
+                            var velrange = player.getVelRange();
+                            var fireCharOffset = randNum(velrange*0.1, velrange*0.5);
+                            var smokeCharOffset = randNum(0, velrange*0.75);
+                            particleSpawners.smoke(x,y, smokeCharOffset,1, layer,true);
+                            particleSpawners.fire(x,y, fireCharOffset,1, layer,true);
+                        }
+                    }
+                }
+            ],
+
+            deathexplosion: [
+                // normal explosion
+                {
+                    name: ['normal', 'explosion'],
+                    description: ['explosions are pretty', 'cool tbh imho tbf fyi'],
+                    cost: 0,
+                    func: function(amt, layer=2) {
+                        var x = player.x + player.w*0.5; var y = player.y + player.h*0.5;
+                        for (var i = 0; i < amt; i++) {
+                            particleSpawners.combust(x,y, 2,true);
+                        }
+                        particleSpawners.boom(x,y, player.vy * DEATHSCROLL_VEL_MUL, 2,true);
+                    }
+                },
+                // animal explosion
+                {
+                    name: ['animal', 'explosion'],
+                    description: ['isnt this explosion just', 'so mf cute !!!'],
+                    cost: 6,
+                    func: function(amt, layer=2) {
+                        var x = player.x + player.w*0.5; var y = player.y + player.h*0.5;
+                        var velrange = 0.75 * (1-player.getVelRange());
+                        for (var i = 0; i < amt; i++) {
+                            var animalprop = particleSpawners.animal(x,y, randNum(-10,10),randNum(0,0.5 + velrange) * -15, 2,true);
+                            animalprop.layer = 2;
+                        }
+                        particleSpawners.boom(x,y, player.vy * DEATHSCROLL_VEL_MUL, 2,true);
+                    }
+                }
+            ]
+        };
+
+        this.equippedanims = {
+            skin: null,
+            particle: null,
+            deathexplosion: null
+        };
         this.dead = false;
         this.prex = 0;
         this.prey = 0;
@@ -29,6 +153,20 @@ class Player extends Entity {
         this.resetstartpositionflag = false;
         this.fallingcoinscollected = 0;
         this.inmaingame = false;
+
+        this.setSkin(0);
+        this.setParticle(0);
+        this.setDeathExplosion(0);
+    }
+
+    setSkin(i) {
+        this.equippedanims.skin = this.animations.skin[i];
+    }
+    setParticle(i) {
+        this.equippedanims.particle = this.animations.particle[i];
+    }
+    setDeathExplosion(i) {
+        this.equippedanims.deathexplosion = this.animations.deathexplosion[i];
     }
 
     resetStartPosition() {
@@ -55,12 +193,7 @@ class Player extends Entity {
         addEvent(() => {
             if (etick === DEATHSCROLL_DELAY) {
                 // explosion
-                for (var i = 0; i < this.camerashake.explosionammount; i++) {
-                    particleSpawners.combust(x,y, 2,true);
-                }
-
-                // boom
-                particleSpawners.boom(x, y, this.vy * DEATHSCROLL_VEL_MUL, 2,true);
+                this.equippedanims.deathexplosion.func(this.camerashake.explosionammount, 2);
 
                 // camera shake
                 cameraShake(this.camerashake.intensity, this.camerashake.durability);
@@ -146,22 +279,9 @@ class Player extends Entity {
         return ['the void'];
     }
 
-    updateParticles() {
-        // particles
-        if (this.particletick >= this.particlerate) {
-            this.particletick = 0;
-
-            var x = this.x + this.w*0.5;
-            var y = this.sprite.y + camY + this.sprite.scale * this.sprite.h;
-            var velrange = this.getVelRange();
-            var fireCharOffset = randNum(velrange*0.1, velrange*0.5);
-            var smokeCharOffset = randNum(0, velrange*0.75);
-            particleSpawners.smoke(x,y, smokeCharOffset,1, 1,true);
-            particleSpawners.fire(x,y, fireCharOffset,1, 1,true);
-        }
-        else {
-            this.particletick++;
-        }
+    updateAnimation() {
+        this.equippedanims.skin.func();
+        this.equippedanims.particle.func(1);
     }
     updatePosition() {
         this.prex = this.x;
@@ -197,7 +317,7 @@ class Player extends Entity {
         if (!this.dead) {
             this.updateVelocity();
             this.updatePosition();
-            this.updateParticles();
+            this.updateAnimation();
             this.updateCamera();
 
             // this.sprite.rotation = false;
@@ -206,7 +326,6 @@ class Player extends Entity {
             // }
         }
         else {
-            //this.checkShouldRestartGame();
             this.deathScrollCamera();
         }
 
@@ -231,18 +350,29 @@ class Cloud extends Entity {
         this.spritepartwidth = 8;
 
         this.sprites = [];
+        this.spritepositions = [];
     }
 
     generateSprites() {
         this.sprites.length = 0;
 
+        // generate sprite
         var centerSpritePieceAmt = Math.floor(this.w/this.spritescale / this.spritepartwidth) + 1; // +1 for safe meaasure
-
         this.sprites.push(new Sprite(assets['entities'], 0,0, 8,16, 16,0, this.spritescale)); // left
         for (var i = 0; i < centerSpritePieceAmt; i++) {
             this.sprites.push(new Sprite(assets['entities'], 0,0, 8,16, 24,0, this.spritescale)); // middle
         }
         this.sprites.push(new Sprite(assets['entities'], 0,0, 8,16, 32,0, this.spritescale)); // right
+
+        // find sprite positions
+        this.spritepositions = new Array(this.sprites.length);
+
+        var lengthM1 = this.sprites.length - 1;
+        this.spritepositions[0] = 0;
+        this.spritepositions[lengthM1] = this.w - this.spritepartwidth;
+        for (var i = 1; i < lengthM1; i++) {
+            this.spritepositions[i] = i * (this.w / this.sprites.length);
+        }
     }
 
     checkTouchingPlayer() {
@@ -266,13 +396,10 @@ class Cloud extends Entity {
     }
 
     updateSprite() {
-        var length = this.sprites.length;
-        var lengthM1 = length - 1;
-        
-        this.sprites[0].centerOnto(correctCamX(this.x), correctCamY(this.y), this.spritepartwidth, this.h);
-        this.sprites[lengthM1].centerOnto(correctCamX(this.x + this.w - this.spritepartwidth), correctCamY(this.y), this.spritepartwidth, this.h);
-        for (var i = 1; i < lengthM1; i++) {
-            this.sprites[i].centerOnto(correctCamX(this.x + i * (this.w / length)), correctCamY(this.y), this.spritepartwidth, this.h)
+        var x = correctCamX(this.x);
+        var y = correctCamY(this.y);
+        for (var i = 0; i < this.sprites.length; i++) {
+            this.sprites[i].centerOnto(x + this.spritepositions[i], y, this.spritepartwidth, this.h);
         }
     }
     draw() {
@@ -484,17 +611,19 @@ class AnimalProp extends Entity {
 
         super(x, y, size*2, size*2);
         this.sprite = new Sprite(assets['entities'], 0,0, size,size, charx,48, 2);
+        this.layer = 1;
 
         this.ay = 0.2;
         this.bouncey = -1.5;
         this.vx = randNum(1, 2.5);
         this.vy = 0;
+        this.canbounce = true;
     }
 
     checkShouldKill() {
         if (this.x >= canvas.width || this.y >= canvas.height + camY) {
             this.shouldkill = true;
-            console.log('-- animal ded lol');
+            // console.log('-- animal ded lol');
         }
     }
 
@@ -506,6 +635,9 @@ class AnimalProp extends Entity {
         this.y += this.vy;
 
         // collision
+        if (!this.canbounce)
+            return;
+
         const floory = canvas.height - FLOORPROP_OFFSET;
         if (this.y + this.h >= floory) {
             this.y = floory - this.h;
@@ -525,6 +657,28 @@ class AnimalProp extends Entity {
     }
     draw() {
         this.updateSprite();
-        bufferFrame(this.sprite, 1);
+        bufferFrame(this.sprite, this.layer);
+    }
+}
+
+class StillProp extends Entity {
+    constructor(x,y, assetname, w,h, charx,chary, scale,layer) {
+        super(x, y, w*scale, h*scale);
+
+        this.sprite = new Sprite(assets[assetname], 0,0, w,h, charx,chary, scale);
+        this.layer = layer;
+    };
+
+    update() {
+
+    }
+
+    updateSprite() {
+        this.sprite.x = correctCamX(this.x);
+        this.sprite.y = correctCamY(this.y);
+    }
+    draw() {
+        this.updateSprite();
+        bufferFrame(this.sprite, this.layer);
     }
 }

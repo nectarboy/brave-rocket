@@ -1,9 +1,9 @@
-var gameversion = '0.4.1';
+var gameversion = '0.4.2';
 
 var globalpaused = false;
 var running = false;
 var requestedframe = false;
-var timeout = null;
+var interval = null;
 
 // game components
 var loopstate = 0;
@@ -89,6 +89,15 @@ function gameReset() {
         METEOR_CHANCE = 1;
     }
 
+    // dizzy mode
+    if (DIZZYMODE) {
+        addEvent(() => {
+            var rad = canvas.width/2;
+            controller.x = Math.sin(tick/30) * rad + rad;
+            return false;
+        })
+    }
+
     // floor prop
     entities.push(spawnFloorProp());
 }
@@ -107,30 +116,25 @@ function requestFrame() {
 }
 
 function gameLoop() {
-    var before = performance.now();
+    if (globalpaused)
+        return;
 
-    if (!globalpaused) {
-        gameUpdate();
-        gameDraw();
-        requestFrame();
-    }
-
-    var after = performance.now();
-
-    timeout = setTimeout(gameLoop, GAME_INTERVAL - (after-before));
+    gameUpdate();
+    gameDraw();
+    requestFrame();
 }
 function gameStart() {
     if (running) return;
     running = true;
 
-    gameLoop();
+    interval = setInterval(gameLoop, GAME_INTERVAL);
 }
 function gameStop() {
     if (!running) return;
     running = false;
 
-    clearTimeout(timeout);
-    timeout = null;
+    clearInterval(interval);
+    interval = null
 }
 
 // DEBUG

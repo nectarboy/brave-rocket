@@ -8,10 +8,11 @@ const controller = {
 
 function setXY(pageX, pageY) {
     const rect = canvas.getBoundingClientRect();
-    const scalemul = canvas.width / rect.width;
+    const scalemulx = canvas.width / rect.width;
+    const scalemuly = canvas.height / rect.height;
 
-    const x = scalemul * (pageX - rect.left);
-    const y = scalemul * (pageY - rect.top);
+    const x = scalemulx * (pageX - rect.left);
+    const y = scalemuly * (pageY - rect.top);
 
     controller.x = x;
     controller.y = y;

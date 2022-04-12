@@ -46,7 +46,7 @@ function spawnFloorProp() {
 }
 
 function spawnAnimalProp() {
-    var animalprop = new AnimalProp(0, 0);
+    var animalprop = new AnimalProp(0, 0, 1);
     animalprop.x = -animalprop.w;
     animalprop.y = canvas.height - FLOORPROP_OFFSET - animalprop.h;
     animalprop.updateSprite();

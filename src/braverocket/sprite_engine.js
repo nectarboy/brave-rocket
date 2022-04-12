@@ -108,7 +108,7 @@ class Text {
         if (this.invisible)
             return;
 
-        ctx.font = this.size + 'px BraveRocketFont';
+        ctx.font = this.size + 'px font_delfino';
         ctx.textAlign = this.center ? 'center' : 'start';
         ctx.fillStyle = this.color;
         for (var i = 0; i < this.text.length; i++) {

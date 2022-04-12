@@ -34,14 +34,16 @@ const loopStates = {
             incutscene = false;
 
             flushGuiBuffer();
+            // free stuff from main game
+            freeGui('gameoverscreen');
+            // buffer stuff
             bufferGui('braverocketlogo');
             gui.braverocketlogo.obj.animtype = 2;
             gui.braverocketlogo.obj.y = gui.braverocketlogo.obj.offstageY;
             bufferGui('logonumber');
             bufferGui('clicktoplay');
             bufferGui('titlescreenfooter');
-            bufferGui('funbutton');
-            bufferGui('playerbutton');
+            bufferGui('titlescreenbuttons');
         },
 
         startGameCutscene() {
@@ -53,8 +55,7 @@ const loopStates = {
             gui.braverocketlogo.obj.animtype = 3;
             gui.titlescreenfooter.obj.text.invisible = true;
             gui.clicktoplay.obj.sprite.invisible = true;
-            gui.funbutton.obj.hide();
-            gui.playerbutton.obj.hide();
+            gui.titlescreenbuttons.obj.hide();
 
             var etick = 0;
             addEvent(() => {
@@ -79,10 +80,11 @@ const loopStates = {
             gui.braverocketlogo.obj.animtype = 5;
             gui.titlescreenfooter.obj.text.invisible = true;
             gui.clicktoplay.obj.sprite.invisible = true;
-            gui.funbutton.obj.hide();
-            gui.playerbutton.obj.hide();
+            gui.titlescreenbuttons.obj.hide();
 
             // spawn player menu
+            bufferGui('playermenu');
+            gui.playermenu.obj.x = gui.playermenu.obj.x1;
         },
         hidePlayerMenuCutscene() {
             if (!incutscene)
@@ -93,8 +95,19 @@ const loopStates = {
             gui.braverocketlogo.obj.animtype = 4;
             gui.titlescreenfooter.obj.text.invisible = false;
             gui.clicktoplay.obj.sprite.invisible = false;
-            gui.funbutton.obj.unhide();
-            gui.playerbutton.obj.unhide();
+            gui.titlescreenbuttons.obj.unhide();
+
+            gui.playermenu.obj.goingright = true;
+            addEvent(() => {
+                if (gui.playermenu.obj === null) {
+                    return true;
+                }
+                if (gui.playermenu.obj.offstage) {
+                    unbufferGui('playermenu');
+                    return true;
+                }
+                return false;
+            })
         }
     },
 
@@ -117,10 +130,21 @@ const loopStates = {
         },
         prepare: function() {
             incutscene = false;
+
             flushGuiBuffer();
-            
+            // free gui from main menu (note :: might decrease performance cuz I CANT FREE THEM INSTANTLY ;-;)
+            freeGui('braverocketlogo');
+            freeGui('logonumber');
+            freeGui('clicktoplay');
+            freeGui('titlescreenfooter');
+            freeGui('titlescreenbuttons');
+
+            // set player offset
             player.offy = PLAYER_MAINGAME_BOTTOM_OFFSET;
             player.prepareForMainGame();
         }
-    }
+    },
+
+    // settings menu
+    // player customization menu
 };
