@@ -21,13 +21,15 @@ html, body {
     border: 1px solid black;
     image-rendering: pixelated;
     -moz-image-rendering: pixelated;
-    font-smooth: never;
-    -webkit-font-smoothing: none;
+    /* this looks absolutely horrendous so no. */
+    /* font-smooth: never; */
+    /* -webkit-font-smoothing: none; */
 
     touch-action: none;
 }
 
-@font-face {
-    font-family: "BraveRocketFont";
+/* we dont need to keep doing this anymore :)  */
+/*@font-face {
+    font-family: "font_delfino";
     src: url("src/assets/Delfino.ttf");
-}
+}*/

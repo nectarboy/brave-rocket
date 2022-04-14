@@ -1,10 +1,9 @@
-var gameversion = '0.3.0';
+var gameversion = '0.4.3';
 
 var globalpaused = false;
-var paused = false;
 var running = false;
 var requestedframe = false;
-var resetflag = false;
+var interval = null;
 
 // game components
 var loopstate = 0;
@@ -22,15 +21,16 @@ function correctCamY(y) {
 
 // game logic
 function gameUpdate() {
-    loopStates[loopstate].update();
     updateEvents();
+    loopStates[loopstate].update();
     DEBUGUPDATE();
 
     tick++;
+    controller.firstclick = false;
 
-    if (resetflag) {
-        gameReset();
-    }
+    // if (resetflag) {
+    //     gameReset();
+    // }
 }
 function gameDraw() {
     if (requestedframe) return;
@@ -53,6 +53,7 @@ function gameReset() {
     resetCloudSpawn();
     resetPlayer();
     resetEntities();
+    resetParticles();
     resetBackgrounds();
     resetGui();
     prepareLoopState(0);
@@ -67,8 +68,34 @@ function gameReset() {
                 etick = 0;
                 cameraShake(20, 0.9);
             }
-            return false;
+            return !EARTHQUAKEMODE;
         });
+    }
+
+    // dog rain mode
+    if (COINRAINMODE) {
+        var etick = 0;
+        addEvent(() => {
+            if (etick++ === 6) {
+                etick = 0;
+                entities.push(spawnFallingCoin());
+            }
+            return !COINRAINMODE;
+        });
+    }
+
+    // meteor shower mode
+    if (METEORSHOWERMODE) {
+        METEOR_CHANCE = 1;
+    }
+
+    // dizzy mode
+    if (DIZZYMODE) {
+        addEvent(() => {
+            var rad = canvas.width/2;
+            controller.x = Math.sin(tick/30) * rad + rad;
+            return false;
+        })
     }
 
     // floor prop
@@ -89,7 +116,8 @@ function requestFrame() {
 }
 
 function gameLoop() {
-    if (globalpaused) return;
+    if (globalpaused)
+        return;
 
     gameUpdate();
     gameDraw();
@@ -99,9 +127,14 @@ function gameStart() {
     if (running) return;
     running = true;
 
-    setInterval(() => {
-        gameLoop();
-    }, GAME_INTERVAL);
+    interval = setInterval(gameLoop, GAME_INTERVAL);
+}
+function gameStop() {
+    if (!running) return;
+    running = false;
+
+    clearInterval(interval);
+    interval = null
 }
 
 // DEBUG

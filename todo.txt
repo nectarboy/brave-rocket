@@ -1,5 +1,9 @@
 (done) stop sprite system using 8x8
+(done) layered framebuffering
+(done) particle pooling
 (wip) gui
+(wip) player customization [skins, particles, explosions]
+(wip) meteors (meteor showers ???)
 velocity meter + score n stuff
 balancing ?
 (wip) death screen
@@ -9,3 +13,4 @@ currency ? collectibles ? secrets ???
 (wip) MORE SPACE
 (wip) BETTER BG
 (wip) easter eggs :3
+(wip) funny animal death explosion effect

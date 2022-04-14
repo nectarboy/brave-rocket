@@ -38,7 +38,7 @@ class Sprite {
         if (this.rotation) {
             ctx.save();
             ctx.translate(Math.round(this.x + w*0.5), Math.round(this.y + h*0.5));
-            ctx.rotate(this.rotdeg * Math.PI / 180);
+            ctx.rotate((this.rotdeg) * Math.PI / 180);
 
             ctx.drawImage(
                 this.asset,
@@ -87,7 +87,7 @@ class WholeSprite {
         ctx.drawImage(
             this.asset,
             Math.round(this.x), Math.round(this.y),
-            0|(this.scale * this.asset.width), 0|(this.scale * this.asset.height)
+            0|(this.scale * this.w), 0|(this.scale * this.h)
         );
     }
 }
@@ -102,15 +102,30 @@ class Text {
         this.size = size;
         this.color = color;
         this.center = center;
+
+        this.fontString = '';
+        this.alignString = '';
+        this.setSize(size);
+        this.setCenter(center);
+    };
+
+    setSize(size) {
+        this.size = size;
+        this.fontString = this.size + 'px font_delfino'; // font_delfino ... arials better tbh
+    }
+    setCenter(center) {
+        this.center = center;
+        this.alignString = center ? 'center' : 'start';
     }
 
     draw() {
         if (this.invisible)
             return;
 
-        ctx.font = this.size + 'px BraveRocketFont';
-        ctx.textAlign = this.center ? 'center' : 'start';
+        ctx.font = this.fontString;
+        ctx.textAlign = this.alignString;
         ctx.fillStyle = this.color;
+
         for (var i = 0; i < this.text.length; i++) {
             ctx.fillText(
                 this.text[i],
