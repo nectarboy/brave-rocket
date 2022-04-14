@@ -52,7 +52,21 @@ loadAssets(
     ],
     // when done
     () => {
+        // save data stuff
+        localstoragesystem.reloadSaveData();
+        if (savedata.version !== gameversion) {
+            writeSaveData(['version'], gameversion);
+        }
+        // snippet of code that makes sure current session is not lost
+        window.onbeforeunload = function() {
+            if (localstoragesystem.exportRequested) {
+                localstoragesystem.exportSaveData(savedata);
+            }
+        };
+
+        // now boot the game :)
         console.log('booting game !');
+        console.log('------------------------');
         gameReset();
         gameStart();
     }

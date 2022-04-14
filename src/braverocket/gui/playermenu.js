@@ -14,8 +14,8 @@ gui.playermenu = {
             class TextboxTitle {
                 constructor() {
                     this.obj = new StillProp(0,0, 'gui_icons', 65,14, 0,64, 2,1);
-                    this.offx = 5;
-                    this.offy = 6;
+                    this.offx = 6;
+                    this.offy = 12;
 
                     this.setType(0);
                 };
@@ -24,9 +24,13 @@ gui.playermenu = {
                     this.obj.sprite.chary = 64 + val * this.obj.sprite.h;
                 }
 
-                update() {
+                updatePosition() {
                     this.obj.x = playermenu.x + this.offx;
                     this.obj.y = playermenu.y + this.offy;
+                }
+
+                update() {
+                    this.updatePosition();
                 }
 
                 updateSprite() {
@@ -48,19 +52,94 @@ gui.playermenu = {
                     this.offy = 4;
                 };
 
+                updatePosition() {
+                    this.obj.x = playermenu.x + this.offx;
+                    this.obj.y = playermenu.y + this.offy;
+                }
+
                 update() {
+                    this.updatePosition();
                     this.obj.update();
                 }
 
                 updateSprite() {
-                    this.obj.x = playermenu.x + this.offx;
-                    this.obj.y = playermenu.y + this.offy;
+                    this.obj.updateSprite();
                 }
                 draw() {
-                    this.updateSprite();
                     this.obj.draw();
                 }
             };
+
+            class SkinTypeButtons {
+                constructor() {
+                    var skintypebuttons = this;
+
+                    // generate buttons
+                    this.buttons = [];
+                    this.typeenums = {
+                        'skin': 0,
+                        'particle': 1,
+                        'deathexplosion': 2
+                    };
+
+                    [['skin', 'Skins'], ['particle', 'Particles'], ['deathexplosion', 'Explosions']].forEach(function(pack) {
+                        var button = new GuiTextButton(new Text(0,0, [pack[1]],10,'#4C4C4C',true), 0,0, 48,0, () => {
+                            skintypebuttons.setType(pack[0]);
+                        });
+
+                        skintypebuttons.buttons.push(button);
+                    });
+
+                    // properties
+                    this.currenttype = '';
+                    this.offx = 7;
+                    this.offy = 48;
+                };
+
+                setType(type) {
+                    if (type === this.currenttype)
+                        return;
+
+                    this.currenttype = type;
+                    playermenu.setSkinType(type);
+                }         
+
+                updatePosition() {
+                    var y = playermenu.y + this.offy;
+                    var buttondistance = playermenu.w / this.buttons.length;
+                    for (var i = 0; i < this.buttons.length; i++) {
+                        this.buttons[i].x = playermenu.x + buttondistance*i - (this.buttons[i].w - buttondistance)*0.5;
+                        this.buttons[i].y = y;
+                    }
+                }
+                updateButtons() {
+                    for (var i = 0; i < this.buttons.length; i++) {
+                        this.buttons[i].update();
+                    }
+                }
+                updateButtonStyles() {
+                    for (var i = 0; i < this.buttons.length; i++) {
+                        this.buttons[i].setIconIndex(1);
+                    }
+                    this.buttons[this.typeenums[this.currenttype]].setIconIndex(0);
+                }
+
+                update() {
+                    this.updatePosition();
+                    this.updateButtons();
+                }
+
+                updateSprite() {
+                    for (var i = 0; i < this.buttons.length; i++) {
+                        this.buttons[i].updateSprite();
+                    }
+                }
+                draw() {
+                    for (var i = 0; i < this.buttons.length; i++) {
+                        this.buttons[i].draw(); // they update sprite themselves within draw
+                    }
+                }
+            }
 
             // arrow buttons
             class ArrowButtons {
@@ -76,8 +155,8 @@ gui.playermenu = {
                         }),
                     ];
 
-                    this.offx = 16;
-                    this.offy = 100;
+                    this.offx = 16; // unused el oh el
+                    this.offy = 95;
                 };
 
                 updatePosition() {
@@ -127,45 +206,66 @@ gui.playermenu = {
                         particle: 0,
                         deathexplosion: 0
                     };
+                    this.equippedcurrentskin = false;
                     this.skinlength = 0;
                     this.objstodraw = 0;
-                    this.type = ''; // 'skin', 'particle', 'deathexplosion'
+                    this.type = 'skin'; // 'skin', 'particle', 'deathexplosion'
                     this.shouldanimate = true;
                     this.explosioninc = 0;
                     this.sliderange = 0;
                     this.slidedest = 0;
-
-                    this.setType('skin');
                 };
 
                 setType(type) {
-                    this.type = type;
-                    //this.currentskin
-                    this.skinlength = this.objs[0].animations[type].length;
-                    this.shouldanimate = (type === 'skin');
-                    this.objstodraw = 2//1 + (type === 'skin');
+                    // reset currently equipped anims
+                    this.current.skin = savedata.equippedanims.skin;
+                    this.current.particle = savedata.equippedanims.particle;
+                    this.current.deathexplosion = savedata.equippedanims.deathexplosion; 
 
+                    // fix currentobj
                     if (this.currentobj === 1) {
                         var obj1 = this.objs[1];
                         this.objs[1] = this.objs[0];
                         this.objs[0] = obj1;
                     }
-                    this.currentobj = 0;             
+                    this.currentobj = 0; 
+
+                    // update preview of previous type
+                    this.updatePreview();
+
+                    this.checkShouldEquipCurrent();
+                    this.type = type;
+                    this.skinlength = this.objs[0].animations[type].length;
+                    this.shouldanimate = (type === 'skin');
+                    this.objstodraw = 2//1 + (type === 'skin');   
 
                     // reset anim
                     this.explosioninc = 0;
                     this.sliderange = 0;
                     this.slidedest = 0;
+
+                    // update our current preview :)
+                    this.updatePreview();
                 }
+
+                updatePreview() {
+                    this.objs[this.currentobj].equippedanims[this.type] = this.objs[this.currentobj].animations[this.type][this.current[this.type]];
+                }
+
                 incSkin() {
                     var previousskin = this.current[this.type]++;
                     if (this.current[this.type] === this.skinlength)
                         this.current[this.type] = 0;
 
+                    // if selected skin is unlocked, equip it
+                    this.checkShouldEquipCurrent();
+
+                    // updating preview
                     if (this.shouldanimate) {
-                        this.objs[0].equippedanims.skin = this.objs[0].animations[this.type][previousskin];
-                        this.objs[1].equippedanims.skin = this.objs[1].animations[this.type][this.current.skin];
                         this.currentobj = 1;
+                        this.objs[0].equippedanims.skin = this.objs[0].animations[this.type][previousskin];
+                        //this.objs[1].equippedanims.skin = this.objs[1].animations[this.type][this.current.skin];
+                        this.updatePreview();
 
                         // animation
                         this.sliderange = 0;
@@ -181,10 +281,15 @@ gui.playermenu = {
                     if (this.current[this.type] < 0)
                         this.current[this.type] = this.skinlength-1;
 
+                    // if selected skin is unlocked, equip it
+                    this.checkShouldEquipCurrent();
+
+                    // updating preview
                     if (this.shouldanimate) {
-                        this.objs[1].equippedanims.skin = this.objs[1].animations[this.type][previousskin];
-                        this.objs[0].equippedanims.skin = this.objs[0].animations[this.type][this.current.skin];
                         this.currentobj = 0;
+                        this.objs[1].equippedanims.skin = this.objs[1].animations[this.type][previousskin];
+                        //this.objs[0].equippedanims.skin = this.objs[0].animations[this.type][this.current.skin];
+                        this.updatePreview();
 
                         // animation
                         this.sliderange = -1;
@@ -195,8 +300,36 @@ gui.playermenu = {
                         this.explosioninc = 0; // in case were on explosions 
                     }
                 }
-                buySkin() {
+                checkShouldEquipCurrent() {
+                    // if selected skin is unlocked, equip it
+                    var animindex = this.current[this.type];
+                    if (savedata.unlockedanims[this.type][animindex] === true) {
+                        writeSaveData(['equippedanims', this.type], animindex);
+                        player.equippedanims[this.type] = player.animations[this.type][animindex]; // update actual players skin in realtime
+                        this.equippedcurrentskin = true;
+                    }
+                    else {
+                        this.equippedcurrentskin = false;
+                    }
+                }
+                buyCurrent() {
+                    var equippedanim = this.objs[this.currentobj].equippedanims[this.type];
+                    var animcost = equippedanim.cost;
+                    var animindex = this.current[this.type];
 
+                    // can buy
+                    if (savedata.coins >= animcost) {
+                        writeSaveData(['coins'], savedata.coins - animcost);
+
+                        // unlock anim
+                        writeSaveData(['unlockedanims', this.type, animindex], true);
+                        this.checkShouldEquipCurrent();
+                        return true;
+                    }
+                    // cant buy
+                    else {
+                        return false;
+                    }
                 }
 
                 updateAnimation() {
@@ -227,8 +360,8 @@ gui.playermenu = {
                             break;
                         }
                     }
-
-                    // position
+                }
+                updatePosition() {
                     for (var i = 0; i < this.objstodraw; i++) {
                         this.objs[i].layer = 2;
 
@@ -246,6 +379,7 @@ gui.playermenu = {
                 }
 
                 update() {
+                    this.updatePosition();
                     this.updateObjs();
                     this.updateAnimation();
                 }
@@ -262,12 +396,154 @@ gui.playermenu = {
                 }
             }
 
+            // skin info
+            class SkinInfo {
+                constructor() {
+                    this.skintitle = {
+                        sprite: new Text(0,0, ['"skin name"'],16,'black',true),
+                        offx: playermenu.w / 2,
+                        offy: 145
+                    };
+                    this.skindescription = {
+                        sprite: new Text(0,0, ['(two lines of)', '(description go here)'],9,'black',true),
+                        offx: playermenu.w / 2,
+                        offy: 162
+                    };
+                    this.skincosticon = {
+                        sprite: new Sprite(assets['entities'], 0,0, 16,16, 0,16, 1),
+                        offx: 58,
+                        offy: 175
+                    };
+                    this.skincost = {
+                        sprite: new Text(0,0, ['x [cost]'],11,'#4C4C4C',false),
+                        offx: 76,
+                        offy: 187
+                    };
+                    this.skinindex = {
+                        sprite: new Text(0,0, ['1 / 1'],9,'#4C4C4C',true),
+                        offx: playermenu.w / 2,
+                        offy: 128
+                    };
+                    this.currentcoinsicon = {
+                        sprite: new Sprite(assets['entities'], 0,0, 16,16, 0,16, 1),
+                        offx: 40,
+                        offy: 229
+                    };
+                    this.currentcoins = {
+                        sprite: new Text(0,0, ['you have: [amt]'],11,'#4C4C4C',false),
+                        offx: 58,
+                        offy: 240
+                    };
+
+                    this.components = [this.skintitle, this.skindescription, this.skincosticon, this.skincost, this.skinindex, this.currentcoinsicon, this.currentcoins];
+                };
+
+                updateInfo() {
+                    var skinpreview = playermenu.skinpreview;
+                    var equippedanim = skinpreview.objs[skinpreview.currentobj].equippedanims[skinpreview.type];
+
+                    var skintitlestring = equippedanim.name;
+                    var skindescriptionstrings = equippedanim.description;
+                    var skinccostnum = equippedanim.cost;
+                    var currentcoinsnum = savedata.coins;
+
+                    this.skintitle.sprite.text[0] = `"${skintitlestring}"`;
+                    this.skindescription.sprite.text = skindescriptionstrings;
+                    this.skincost.sprite.text[0] = skinccostnum === 0 ? '× FREE' : `× $${skinccostnum}`;
+                    this.skinindex.sprite.text[0] = `${skinpreview.current[skinpreview.type]+1} / ${skinpreview.skinlength}`;
+                    this.currentcoins.sprite.text[0] = `you have: ${currentcoinsnum}`;
+                }
+
+                update() {
+
+                }
+
+                updateComponentSprite(component) {
+                    component.sprite.x = playermenu.x + component.offx;
+                    component.sprite.y = playermenu.y + component.offy;
+                }
+
+                updateSprite() {
+                    for (var i = 0; i < this.components.length; i++) {
+                        this.updateComponentSprite(this.components[i]);
+                    }
+                }
+                draw() {
+                    for (var i = 0; i < this.components.length; i++) {
+                        this.updateComponentSprite(this.components[i]);
+                        bufferFrame(this.components[i].sprite, 2);
+                    } 
+                }
+            }
+
+            // buy button
+            class BuyButton {
+                constructor() {
+                    var buybutton = this;
+
+                    this.button = new GuiTextButton(new Text(0,0, ['...'],15,'#22492D',true), 0,0, 128,3, () => {
+                        if (buybutton.selected)
+                            return;
+
+                        playermenu.buyCurrentAnim();
+                    });
+                    this.offy = 200;
+
+                    this.selected = false;
+                };
+
+                updateButton() {
+                    var skinpreview = playermenu.skinpreview;
+                    var equippedanim = skinpreview.objs[skinpreview.currentobj].equippedanims[skinpreview.type];
+
+                    this.selected = skinpreview.equippedcurrentskin; // (equippedanim.cost === 0); // should be true when free or already purchased
+
+                    // button style
+                    // when free or already purchased
+                    if (this.selected) {
+                        this.button.setIconIndex(2);
+                        this.button.text.text[0] = 'Selected !';
+                        this.button.text.color = '#AF676B';
+                    }
+                    // when unpurchased
+                    else {
+                        this.button.setIconIndex(3);
+                        this.button.text.text[0] = 'BUY';
+                        this.button.text.color = '#22492D';
+                    }
+                }
+
+                updatePosition() {
+                    this.button.x = playermenu.x + playermenu.w*0.5 - this.button.w*0.5;
+                    this.button.y = playermenu.y + this.offy;
+                }
+
+                update() {
+                    this.updatePosition();
+                    this.button.update();
+                }
+
+                updateSprite() {
+                    this.button.updateSprite();
+                }
+                draw() {
+                    this.button.draw();
+                }
+            };
+
             // yea
             this.exitbutton = new ExitButton();
             this.textboxtitle = new TextboxTitle();
+            this.skintypebuttons = new SkinTypeButtons();
             this.arrowbuttons = new ArrowButtons();
             this.skinpreview = new SkinPreview();
-            this.components = [this.exitbutton, this.textboxtitle, this.arrowbuttons, this.skinpreview];
+            this.skininfo = new SkinInfo();
+            this.buybutton = new BuyButton();
+
+            this.skinpreview.setType('skin');
+            this.skintypebuttons.setType('skin');
+            this.buybutton.updateButton();
+            this.components = [this.exitbutton, this.textboxtitle, this.skintypebuttons, this.arrowbuttons, this.skinpreview, this.skininfo, this.buybutton];
 
             // constants
             this.x1 = canvas.width + 120;
@@ -283,22 +559,43 @@ gui.playermenu = {
         };
 
         // preview methods
-        setSkinType(type) {
-            this.skinpreview.setType(type);
+        updateWholePreview() {
+            this.skintypebuttons.updateButtonStyles();
+            this.skininfo.updateInfo();
+            this.buybutton.updateButton();
+        }
+        incSkin() {
+            this.skinpreview.incSkin();
+            this.skininfo.updateInfo();
+            this.buybutton.updateButton();
+        }
+        decSkin() {
+            this.skinpreview.decSkin();
+            this.skininfo.updateInfo();
+            this.buybutton.updateButton();
+        }
 
-            // textbox title
+        setSkinType(type) {
             const typeenums = {
                 'skin': 0,
                 'particle': 1,
                 'deathexplosion': 2
             };
+
+            // update all components
+            this.skinpreview.setType(type);
             this.textboxtitle.setType(typeenums[type]);
+            this.updateWholePreview();
         }
-        incSkin() {
-            this.skinpreview.incSkin();
-        }
-        decSkin() {
-            this.skinpreview.decSkin();
+        buyCurrentAnim() {
+            // success
+            if (this.skinpreview.buyCurrent()) {
+                this.updateWholePreview();
+            }
+            // fail
+            else {
+                cameraShake(13, 0.8);
+            }
         }
 
         updateAnimation() {

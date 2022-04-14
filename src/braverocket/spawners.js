@@ -5,6 +5,9 @@ function spawnPlayer() {
     player.resetStartPosition();
     player.updateSprite();
     player.updateCamera();
+    player.setSkin(savedata.equippedanims.skin);
+    player.setParticle(savedata.equippedanims.particle);
+    player.setDeathExplosion(savedata.equippedanims.deathexplosion);
         
     return player;
 }

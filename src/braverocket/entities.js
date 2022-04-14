@@ -19,7 +19,7 @@ class Player extends Entity {
             skin: [
                 // default rocket
                 {
-                    name: ['default', 'rocket'],
+                    name: 'Default Rocket',
                     description: ['the default rocket we', 'all know and love :)'],
                     cost: 0,
                     func: function() {
@@ -29,9 +29,9 @@ class Player extends Entity {
                 },
                 // space ship
                 {
-                    name: ['space', 'ship'],
+                    name: 'Spaceship',
                     description: ['this one is super duper', 'epic dont you think'],
-                    cost: 4,
+                    cost: 3,
                     func: function() {
                         player.sprite.charx = 112;
                         player.sprite.chary = 0;
@@ -39,9 +39,9 @@ class Player extends Entity {
                 },
                 // UFO
                 {
-                    name: ['U.F.O'],
+                    name: 'U.F.O',
                     description: ['gigigy gigidy goo. THE', 'ALIENS ARE HERE o_O'],
-                    cost: 4,
+                    cost: 3,
                     func: function() {
                         player.sprite.charx = 112;
                         player.sprite.chary = 16;
@@ -49,19 +49,24 @@ class Player extends Entity {
                 },
                 // rainbow balloon
                 {
-                    name: ['rainbow', 'balloon'],
+                    name: 'Rainbow Balloon',
                     description: ['this cool balloon cycles', 'the colors of the rainbow :D'],
-                    cost: 6,
+                    cost: 5,
                     func: function() {
-                        player.sprite.charx = 128;
+                        var velrange = player.getVelRange();
+                        if (velrange !== velrange)
+                            velrange = 1; // NaN check
+                        var step = 0|(tick * 0.15) % 6;
+
+                        player.sprite.charx = 128 + step * 16;;
                         player.sprite.chary = 16;
                     }
                 },
                 // poopcrapper
                 {
-                    name: ['poopcrapper'],
+                    name: 'Poopcrapper',
                     description: ['oh mein got! ich hab', 'poopshitten mein panten!!!'],
-                    cost: 4,
+                    cost: 2,
                     func: function() {
                         player.sprite.charx = 128;
                         player.sprite.chary = 0;
@@ -69,7 +74,7 @@ class Player extends Entity {
                 },
                 // missingno
                 {
-                    name: ['MISSINGNO.'],
+                    name: 'MISSINGNO.',
                     description: ['this skin just added', 'itself one day idrk tbh'],
                     cost: 2,
                     func: function() {
@@ -82,7 +87,7 @@ class Player extends Entity {
             particle: [
                 // rocket flame
                 {
-                    name: ['rocket', 'flame'],
+                    name: 'Default Exhaust',
                     description: ['fires always cool', 'dont you think?'],
                     cost: 0,
                     func: function(layer=1) {
@@ -104,7 +109,7 @@ class Player extends Entity {
             deathexplosion: [
                 // normal explosion
                 {
-                    name: ['normal', 'explosion'],
+                    name: 'Default Explosion',
                     description: ['explosions are pretty', 'cool tbh imho tbf fyi'],
                     cost: 0,
                     func: function(amt, layer=2) {
@@ -117,9 +122,9 @@ class Player extends Entity {
                 },
                 // animal explosion
                 {
-                    name: ['animal', 'explosion'],
+                    name: 'Animal Blast',
                     description: ['isnt this explosion just', 'so mf cute !!!'],
-                    cost: 6,
+                    cost: 3,
                     func: function(amt, layer=2) {
                         var x = player.x + player.w*0.5; var y = player.y + player.h*0.5;
                         var velrange = 0.75 * (1-player.getVelRange());
@@ -144,6 +149,7 @@ class Player extends Entity {
         this.vy = 0;
         this.offy = 0;
         this.deathscroll = 0;
+        this.skintick = 0;
         this.particletick = 0;
         this.camerashake = {
             intensity: 0,
@@ -232,6 +238,7 @@ class Player extends Entity {
             return false;
 
         this.dead = true;
+        this.updateSaveData();
         this.deathAnimation();
         return true;
     }
@@ -251,6 +258,15 @@ class Player extends Entity {
 
         gameReset();
         prepareLoopState(1);
+    }
+    updateSaveData() {
+        var coins = savedata.coins + this.fallingcoinscollected;
+        var highscore_meters = 0|this.getMetersInAir();
+
+        if (coins !== savedata.coins)
+            writeSaveData(['coins'], coins);
+        if (highscore_meters > savedata.highscore_meters)
+            writeSaveData(['highscore_meters'], highscore_meters);
     }
 
     // info stuff
@@ -674,8 +690,8 @@ class StillProp extends Entity {
     }
 
     updateSprite() {
-        this.sprite.x = correctCamX(this.x);
-        this.sprite.y = correctCamY(this.y);
+        this.sprite.x = this.x;
+        this.sprite.y = this.y;
     }
     draw() {
         this.updateSprite();

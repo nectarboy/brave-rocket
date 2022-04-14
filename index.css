@@ -28,7 +28,8 @@ html, body {
     touch-action: none;
 }
 
-@font-face {
-    font-family: "BraveRocketFont"; /* i gotta do this a different way fr */
+/* we dont need to keep doing this anymore :)  */
+/*@font-face {
+    font-family: "font_delfino";
     src: url("src/assets/Delfino.ttf");
-}
+}*/

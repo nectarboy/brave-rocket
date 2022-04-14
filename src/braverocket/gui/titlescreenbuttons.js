@@ -37,7 +37,7 @@ gui.titlescreenbuttons = {
                 button.y = canvas.height - 6 - (button.h);
             }
 
-            // this.buttons.push(new GuiTextButton(new Text(0,0, ['uwu'], 16,'#4C4C4C',true), 4,6, false,0, function() {
+            // this.buttons.push(new GuiTextButton(new Text(0,0, ['uwu'], 12,'#4C4C4C',true), 40,60, 32,0, function() {
             //     entities.push(spawnMeteor());
             // }));
         }
