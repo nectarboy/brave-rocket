@@ -34,9 +34,9 @@ function onTouchMove(e) {
     setXY(e.touches[0].pageX, e.touches[0].pageY);
 }
 function onTouchDown(e) {
+    controller.firstclick = (!controller.touching); // pls work
     controller.touching = true;
     controller.clicking = true;
-    controller.firstclick = true;
     setXY(e.touches[0].pageX, e.touches[0].pageY);
 }
 function onTouchUp(e) {
