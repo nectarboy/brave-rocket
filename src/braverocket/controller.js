@@ -32,16 +32,19 @@ function onMouseUp(e) {
 
 function onTouchMove(e) {
     setXY(e.touches[0].pageX, e.touches[0].pageY);
+    e.preventDefault();
 }
 function onTouchDown(e) {
-    controller.firstclick = (!controller.touching); // pls work
+    controller.firstclick = !controller.touching;
     controller.touching = true;
     controller.clicking = true;
-    setXY(e.touches[0].pageX, e.touches[0].pageY);
+    onTouchMove(e);
+    e.preventDefault();
 }
 function onTouchUp(e) {
     controller.touching = false;
     controller.clicking = false;
+    e.preventDefault();
 } 
 
 document.addEventListener('mousemove', onMouseMove);
