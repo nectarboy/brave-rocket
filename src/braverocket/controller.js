@@ -37,6 +37,7 @@ function onTouchDown(e) {
     controller.touching = true;
     controller.clicking = true;
     controller.firstclick = true;
+    setXY(e.touches[0].pageX, e.touches[0].pageY);
 }
 function onTouchUp(e) {
     controller.touching = false;
